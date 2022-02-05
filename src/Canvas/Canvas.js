@@ -30,11 +30,15 @@ const Canvas = props => {
     const drawLine = (ctx, x, y) => {
 
         ctx.lineTo(x, y);
+    };
+
+    const drawLineFinish = (ctx) => {
+
         ctx.stroke();
     };
 
     const elementaryRule = [ 'L', 'R', 'L' ];
-    const stepCount = 3;
+    const stepCount = 4;
     const calculationType = 'recursive';    // 'recursive' | 'iterative'
 
     let recursionCount = 0;
@@ -96,6 +100,17 @@ const Canvas = props => {
         return currentRule;
     };
 
+    const measureTime = (fn) => {
+
+        const before = new Date();
+
+        fn();
+
+        const after = new Date();
+
+        return after.getTime() - before.getTime();
+    };
+
     useEffect(() => {
 
         const canvas = canvasRef.current;
@@ -103,21 +118,27 @@ const Canvas = props => {
 
         clearCanvas(context);
 
-        if (stepCount > 5) {
-            drawText(context, 'too many recursion steps (max. 5) !', 30, 50);
+        // NOTE stack size exceeds with stepCount = 9 (at least on my computer) !
+        if (stepCount > 8) {
+            drawText(context, 'too many recursion steps (max. 8) !', 30, 50);
             return;
         }
 
         drawText(context, calculationType, 10, 20);
 
         let rule;
+        let calculationTime = 0;
         if (calculationType === 'recursive') {
 
-            rule = determineRuleRecursive([ 'R', 'R' ], 0);
+            calculationTime = measureTime(() => {
+                rule = determineRuleRecursive([ 'R', 'R' ], 0);
+            });
 
         } else if (calculationType === 'iterative') {
 
-            rule = determineRuleIterative([ 'R', 'R' ]);
+            calculationTime = measureTime(() => {
+                rule = determineRuleIterative([ 'R', 'R' ]);
+            });
         }
 
         rule.unshift('init');       // first line
@@ -128,30 +149,41 @@ const Canvas = props => {
         let angle = 0;
 
         drawText(context, `${rule.length} segments`, 10, 40);
-        drawText(context, `${recursionCount} recursions`, 10, 60);
-        drawText(context, `${iterationCount} iterations`, 10, 80);
-        drawText(context, `${joinCount} joins`, 10, 100);
+        if (calculationType === 'recursive') {
+            drawText(context, `${recursionCount} recursions`, 10, 60);
+        } else if (calculationType === 'iterative') {
+            drawText(context, `${iterationCount} iterations`, 10, 60);
+        }
+        drawText(context, `${joinCount} joins`, 10, 80);
+        drawText(context, `calculation time: ${calculationTime} ms`, 10, 360);
 
-        drawLineInit(context, x, y);
+        const drawTime = measureTime(() => {
 
-        rule.forEach(element => {
+            drawLineInit(context, x, y);
 
-            switch (element) {
-                case 'L':
-                    angle += Math.PI / 3.0;
-                    break;
-                case 'R':
-                    angle -= 2.0 * Math.PI / 3.0;
-                    break;
-                default:
-                    break;
-            }
+            rule.forEach(element => {
 
-            x += Math.cos(angle) * length;
-            y -= Math.sin(angle) * length;
+                switch (element) {
+                    case 'L':
+                        angle += Math.PI / 3.0;
+                        break;
+                    case 'R':
+                        angle -= 2.0 * Math.PI / 3.0;
+                        break;
+                    default:
+                        break;
+                }
 
-            drawLine(context, x, y);
+                x += Math.cos(angle) * length;
+                y -= Math.sin(angle) * length;
+
+                drawLine(context, x, y);
+            });
+
+            drawLineFinish(context);
         });
+
+        drawText(context, `draw time: ${drawTime} ms`, 10, 380);
     });
 
     return <canvas ref={canvasRef} {...props} />;
