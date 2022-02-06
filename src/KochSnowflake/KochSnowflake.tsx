@@ -2,6 +2,7 @@ import React from 'react';
 
 import measureTime from '../Utils/measureTime';
 import DrawKochSnowflake from './DrawKochSnowflake';
+import KochSnowflakeSettings from './KochSnowflakeSettings';
 
 type KochSnowflakeProps = {};
 
@@ -101,19 +102,27 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
         return currentRule;
     }
 
+    submit(values: any) {
+
+        console.log(values);
+    }
+
     render() {
 
         return (
-            <DrawKochSnowflake
-                canvasProps={{ width: '1000', height: '800' }}
-                stepCount={this.stepCount}
-                calculationType={this.calculationType}
-                recursionCount={this.recursionCount}
-                iterationCount={this.iterationCount}
-                calculationTime={this.calculationTime}
-                joinCount={this.joinCount}
-                rule={this.rule}
-            />
+            <div>
+                <KochSnowflakeSettings onSubmit={this.submit}/>
+                <DrawKochSnowflake
+                    canvasProps={{ width: '1000', height: '800' }}
+                    stepCount={this.stepCount}
+                    calculationType={this.calculationType}
+                    recursionCount={this.recursionCount}
+                    iterationCount={this.iterationCount}
+                    calculationTime={this.calculationTime}
+                    joinCount={this.joinCount}
+                    rule={this.rule}
+                />
+            </div>
         );
     }
 }
