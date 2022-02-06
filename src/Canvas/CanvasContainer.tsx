@@ -1,12 +1,22 @@
-import React from 'react';
 import './CanvasContainer.css';
 
-class CanvasContainer extends React.Component {
+import React, { RefObject } from 'react';
 
-    ctx;
+type CanvasContainerProps = {
+    canvasProps: { width: string, height: string };
+};
 
-    constructor(props) {
+class CanvasContainer extends React.Component<CanvasContainerProps> {
+
+    canvasProps: { width: string, height: string };
+
+    canvasRef: RefObject<HTMLCanvasElement>;
+    ctx: CanvasRenderingContext2D;
+
+    constructor(props: CanvasContainerProps) {
+
         super(props);
+
         this.canvasProps = props.canvasProps;
 
         this.canvasRef = React.createRef();
@@ -58,7 +68,10 @@ class CanvasContainer extends React.Component {
     }
 
     render() {
-        return <canvas ref={this.canvasRef} {...this.canvasProps} />;
+        return <canvas
+            ref={this.canvasRef}
+            {...this.canvasProps}
+        />;
     }
 }
 

@@ -1,19 +1,40 @@
-import React from "react";
-import measureTime from '../Utils/measureTime';
-import CanvasContainer from "../Canvas/CanvasContainer";
+import React, { RefObject } from 'react';
 
-class DrawKochSnowflake extends React.Component {
+import CanvasContainer from '../Canvas/CanvasContainer';
+import measureTime from '../Utils/measureTime';
+
+type DrawKochSnowflakeProps = {
+    canvasProps: { width: string, height: string };
+    stepCount: number;
+    calculationType: 'recursive' | 'iterative';
+    recursionCount: number;
+    iterationCount: number;
+    calculationTime: number;
+    joinCount: number;
+    rule: string[];
+};
+
+class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
     // https://www.section.io/engineering-education/desktop-application-with-react/
     // https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
 
-    constructor(props) {
+    canvasProps: { width: string, height: string };
+    stepCount: number;
+    calculationType: 'recursive' | 'iterative';
+    recursionCount: number;
+    iterationCount: number;
+    calculationTime: number;
+    joinCount: number;
+    rule: string[];
+
+    canvasContainerRef: RefObject<CanvasContainer>;
+
+    constructor(props: DrawKochSnowflakeProps) {
+
         super(props);
 
-        this.canvasProps = {
-            width: props.width,
-            height: props.height,
-        };
+        this.canvasProps = props.canvasProps;
         this.stepCount = props.stepCount;
         this.calculationType = props.calculationType;
         this.recursionCount = props.recursionCount;

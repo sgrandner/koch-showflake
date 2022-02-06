@@ -1,12 +1,13 @@
-import React from "react";
-import DrawKochSnowflake from "./DrawKochSnowflake";
-import measureTime from "../Utils/measureTime";
+import React from 'react';
+
+import measureTime from '../Utils/measureTime';
+import DrawKochSnowflake from './DrawKochSnowflake';
 
 class KochSnowflake extends React.Component {
 
     elementaryRule = [ 'L', 'R', 'L' ];
     stepCount = 6;
-    calculationType = 'recursive';    // 'recursive' | 'iterative'
+    calculationType: 'recursive' | 'iterative' = 'recursive';
 
     rule = [];
 
@@ -102,8 +103,7 @@ class KochSnowflake extends React.Component {
 
         return (
             <DrawKochSnowflake
-                width='1000'
-                height='800'
+                canvasProps={{ width: '1000', height: '800' }}
                 stepCount={this.stepCount}
                 calculationType={this.calculationType}
                 recursionCount={this.recursionCount}
