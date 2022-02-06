@@ -50,10 +50,10 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
         const canvas = this.canvasContainerRef.current;
 
-        canvas.clearCanvas();
+        canvas?.clearCanvas();
 
         if (this.stepCount > 8) {
-            canvas.drawText(30, 50, 'too many recursion steps (max. 8) !');
+            canvas?.drawText(30, 50, 'too many recursion steps (max. 8) !');
             return;
         }
 
@@ -69,18 +69,18 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             recursionIterationCountText = `${this.iterationCount} iterations`;
         }
 
-        canvas.drawTextLines(
+        canvas?.drawTextLines(
             20,
             40,
             this.calculationType,
             `${this.rule.length} segments`,
-            recursionIterationCountText,
+            recursionIterationCountText || '',
             `${this.joinCount} joins`,
         );
 
         const drawTime = measureTime(() => {
 
-            canvas.drawLineInit(x, y);
+            canvas?.drawLineInit(x, y);
 
             this.rule.forEach(element => {
 
@@ -98,13 +98,13 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 x += Math.cos(angle) * length;
                 y -= Math.sin(angle) * length;
 
-                canvas.drawLine(x, y);
+                canvas?.drawLine(x, y);
             });
 
-            canvas.drawLineFinish();
+            canvas?.drawLineFinish();
         });
 
-        canvas.drawTextLines(
+        canvas?.drawTextLines(
             20,
             720,
             `calculation time: ${this.calculationTime} ms`,

@@ -3,20 +3,22 @@ import React from 'react';
 import measureTime from '../Utils/measureTime';
 import DrawKochSnowflake from './DrawKochSnowflake';
 
-class KochSnowflake extends React.Component {
+type KochSnowflakeProps = {};
 
-    elementaryRule = [ 'L', 'R', 'L' ];
+class KochSnowflake extends React.Component<KochSnowflakeProps> {
+
+    elementaryRule: string[] = [ 'L', 'R', 'L' ];
     stepCount = 6;
     calculationType: 'recursive' | 'iterative' = 'recursive';
 
-    rule = [];
+    rule: string[] = [];
 
     recursionCount = 0;
     iterationCount = 0;
     joinCount = 0;
     calculationTime = 0;
 
-    constructor(props) {
+    constructor(props: KochSnowflakeProps) {
         super(props);
         this.calculate();
     }
@@ -44,7 +46,7 @@ class KochSnowflake extends React.Component {
         this.rule.unshift('init');       // first line
     }
 
-    determineRuleRecursive(rule, stepIndex) {
+    determineRuleRecursive(rule: string[], stepIndex: number): string[] {
 
         if (stepIndex >= this.stepCount) {
             return rule;
@@ -69,7 +71,7 @@ class KochSnowflake extends React.Component {
         return nextRule;
     }
 
-    determineRuleIterative(rule) {
+    determineRuleIterative(rule: string[]): string[] {
 
         let currentRule = rule;
 

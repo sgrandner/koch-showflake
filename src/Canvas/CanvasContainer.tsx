@@ -11,7 +11,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     canvasProps: { width: string, height: string };
 
     canvasRef: RefObject<HTMLCanvasElement>;
-    ctx: CanvasRenderingContext2D;
+    ctx: CanvasRenderingContext2D | undefined | null;
 
     constructor(props: CanvasContainerProps) {
 
@@ -25,44 +25,71 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     componentDidMount() {
 
         const canvas = this.canvasRef.current;
-        this.ctx = canvas.getContext('2d');
+
+        if (!!canvas) {
+            this.ctx = canvas.getContext('2d');
+        }
     }
 
     clearCanvas() {
+
+        if (!this.ctx) {
+            return;
+        }
 
         this.ctx.fillStyle = '#ffffff';
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    drawText(x, y, text) {
+    drawText(x: number, y: number, text: string) {
+
+        if (!this.ctx) {
+            return;
+        }
 
         this.ctx.font = '32px serif';
         this.ctx.fillStyle = '#000000';
         this.ctx.fillText(text, x, y);
     }
 
-    drawTextLines(x, y, ...textLines) {
+    drawTextLines(x: number, y: number, ...textLines: string[]) {
+
+        if (!this.ctx) {
+            return;
+        }
 
         this.ctx.font = '32px serif';
         this.ctx.fillStyle = '#000000';
 
         textLines.forEach((text, index) => {
-            this.ctx.fillText(text, x, y + index * 40);
+            this.ctx?.fillText(text, x, y + index * 40);
         });
     }
 
-    drawLineInit(x, y) {
+    drawLineInit(x: number, y: number) {
+
+        if (!this.ctx) {
+            return;
+        }
 
         this.ctx.beginPath();
         this.ctx.moveTo(x, y);
     }
 
-    drawLine(x, y) {
+    drawLine(x: number, y: number) {
+
+        if (!this.ctx) {
+            return;
+        }
 
         this.ctx.lineTo(x, y);
     }
 
     drawLineFinish() {
+
+        if (!this.ctx) {
+            return;
+        }
 
         this.ctx.stroke();
     }

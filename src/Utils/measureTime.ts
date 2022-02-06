@@ -1,5 +1,5 @@
 
-const measureTime = (fn) => {
+const measureTime = (fn: Function) => {
 
     const before = new Date();
 
