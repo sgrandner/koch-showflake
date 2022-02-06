@@ -1,5 +1,5 @@
 import './App.css';
-import Canvas from './Canvas/Canvas';
+import KochSnowflake from './KochSnowflake/KochSnowflake';
 
 function App() {
     return (
@@ -7,7 +7,7 @@ function App() {
             <header>
                 Kochsche Schneeflocke
             </header>
-            <Canvas width='500' height='400' />
+            <KochSnowflake />
         </div>
     );
 }
