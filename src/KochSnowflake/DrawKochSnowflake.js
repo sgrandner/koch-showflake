@@ -31,31 +31,31 @@ class DrawKochSnowflake extends React.Component {
 
         canvas.clearCanvas();
 
-        // NOTE stack size exceeds with stepCount = 9 (at least on my computer) !
         if (this.stepCount > 8) {
-            canvas.drawText('too many recursion steps (max. 8) !', 30, 50);
+            canvas.drawText(30, 50, 'too many recursion steps (max. 8) !');
             return;
         }
 
-        canvas.drawText(this.calculationType, 10, 20);
-
-        let x = 100;
-        let y = 110;
-        let length = 300 / 3 ** this.stepCount;
+        let x = 200;
+        let y = 220;
+        let length = 600 / 3 ** this.stepCount;
         let angle = 0;
 
-        canvas.drawText(`${this.rule.length} segments`, 10, 40);
+        let recursionIterationCountText;
         if (this.calculationType === 'recursive') {
-
-            canvas.drawText(`${this.recursionCount} recursions`, 10, 60);
-
+            recursionIterationCountText = `${this.recursionCount} recursions`;
         } else if (this.calculationType === 'iterative') {
-
-            canvas.drawText(`${this.iterationCount} iterations`, 10, 60);
-
+            recursionIterationCountText = `${this.iterationCount} iterations`;
         }
-        canvas.drawText(`${this.joinCount} joins`, 10, 80);
-        canvas.drawText(`calculation time: ${this.calculationTime} ms`, 10, 360);
+
+        canvas.drawTextLines(
+            20,
+            40,
+            this.calculationType,
+            `${this.rule.length} segments`,
+            recursionIterationCountText,
+            `${this.joinCount} joins`,
+        );
 
         const drawTime = measureTime(() => {
 
@@ -83,7 +83,12 @@ class DrawKochSnowflake extends React.Component {
             canvas.drawLineFinish();
         });
 
-        canvas.drawText(`draw time: ${drawTime} ms`, 10, 380);
+        canvas.drawTextLines(
+            20,
+            720,
+            `calculation time: ${this.calculationTime} ms`,
+            `draw time: ${drawTime} ms`,
+        );
     }
 
     render() {

@@ -22,6 +22,11 @@ class KochSnowflake extends React.Component {
 
     calculate() {
 
+        // NOTE stack size exceeds with stepCount = 9 (at least on my computer) !
+        if (this.stepCount > 8) {
+            return;
+        }
+
         if (this.calculationType === 'recursive') {
 
             this.calculationTime = measureTime(() => {
@@ -97,8 +102,8 @@ class KochSnowflake extends React.Component {
 
         return (
             <DrawKochSnowflake
-                width='500'
-                height='400'
+                width='1000'
+                height='800'
                 stepCount={this.stepCount}
                 calculationType={this.calculationType}
                 recursionCount={this.recursionCount}

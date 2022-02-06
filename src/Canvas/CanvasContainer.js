@@ -24,11 +24,21 @@ class CanvasContainer extends React.Component {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    drawText(text, x, y) {
+    drawText(x, y, text) {
 
-        this.ctx.font = '16px serif';
+        this.ctx.font = '32px serif';
         this.ctx.fillStyle = '#000000';
         this.ctx.fillText(text, x, y);
+    }
+
+    drawTextLines(x, y, ...textLines) {
+
+        this.ctx.font = '32px serif';
+        this.ctx.fillStyle = '#000000';
+
+        textLines.forEach((text, index) => {
+            this.ctx.fillText(text, x, y + index * 40);
+        });
     }
 
     drawLineInit(x, y) {
