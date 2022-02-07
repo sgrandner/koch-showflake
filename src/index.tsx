@@ -5,8 +5,10 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
 import App from './App';
-import store from './reducer';
 import reportWebVitals from './reportWebVitals';
+import configureStore from './Store/configureStore';
+
+const store = configureStore();
 
 ReactDOM.render(
     <React.StrictMode>
