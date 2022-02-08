@@ -1,21 +1,33 @@
-// TODO types !!!
+import {
+    Action,
+    PreloadedState,
+    Reducer,
+    Store,
+    StoreCreator,
+    StoreEnhancer,
+} from 'redux';
 
-const round = (number: any) => Math.round(number * 100) / 100
+const round = (number: number) => Math.round(number * 100) / 100
 
-const monitorReducerEnhancer =
-    (createStore: any) => (reducer: any, initialState: any, enhancer: any) => {
-        const monitoredReducer = (state: any, action: any) => {
-            const start = performance.now()
-            const newState = reducer(state, action)
-            const end = performance.now()
-            const diff = round(end - start)
+// FIXME types !
+// see also https://stackoverflow.com/questions/50451854/trouble-with-typescript-typing-for-store-enhancers-in-redux-4-0
 
-            console.log('reducer process time:', diff)
+const monitorReducerEnhancer: any =
+    (createStore: StoreCreator) =>
+        <S, A extends Action, Ext, StateExt>(reducer: Reducer<S & StateExt, A>, initialState: PreloadedState<S & StateExt>, enhancer: StoreEnhancer<Ext>): Store<S & StateExt, A> & Ext => {
 
-            return newState
-        }
+            const monitoredReducer = (state: S & StateExt | undefined, action: A) => {
+                const start = performance.now();
+                const newState = reducer(state, action);
+                const end = performance.now();
+                const diff = round(end - start);
 
-        return createStore(monitoredReducer, initialState, enhancer)
-    };
+                console.log('reducer process time:', diff);
+
+                return newState;
+            };
+
+            return createStore(monitoredReducer, initialState, enhancer);
+        };
 
 export default monitorReducerEnhancer;

@@ -1,6 +1,8 @@
-// TODO types !!!
+import { Middleware } from 'redux';
 
-const logger = (store: any) => (next: any) => (action: any) => {
+// typed middleware see https://stackoverflow.com/questions/45339448/how-do-you-create-strongly-typed-redux-middleware-in-typescript-from-reduxs-typ
+
+const logger: Middleware = (store) => (next) => (action) => {
 
     console.group(action.type);
     console.info('dispatching', action);
