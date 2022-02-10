@@ -8,6 +8,7 @@ type CanvasContainerProps = {
 
 class CanvasContainer extends React.Component<CanvasContainerProps> {
 
+    // FIXME use this.props instead of additional properties !
     canvasProps: { width: string, height: string };
 
     canvasRef: RefObject<HTMLCanvasElement>;

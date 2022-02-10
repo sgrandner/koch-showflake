@@ -1,6 +1,8 @@
 import React, { RefObject } from 'react';
+import { connect } from 'react-redux';
 
 import CanvasContainer from '../Canvas/CanvasContainer';
+import { RootState } from '../Store/reducer';
 import measureTime from '../Utils/measureTime';
 
 type DrawKochSnowflakeProps = {
@@ -12,6 +14,7 @@ type DrawKochSnowflakeProps = {
     calculationTime: number;
     joinCount: number;
     rule: string[];
+    asdf: number;
 };
 
 class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
@@ -19,30 +22,11 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
     // https://www.section.io/engineering-education/desktop-application-with-react/
     // https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
 
-    canvasProps: { width: string, height: string };
-    stepCount: number;
-    calculationType: 'recursive' | 'iterative';
-    recursionCount: number;
-    iterationCount: number;
-    calculationTime: number;
-    joinCount: number;
-    rule: string[];
-
     canvasContainerRef: RefObject<CanvasContainer>;
 
     constructor(props: DrawKochSnowflakeProps) {
 
         super(props);
-
-        this.canvasProps = props.canvasProps;
-        this.stepCount = props.stepCount;
-        this.calculationType = props.calculationType;
-        this.recursionCount = props.recursionCount;
-        this.iterationCount = props.iterationCount;
-        this.calculationTime = props.calculationTime;
-        this.joinCount = props.joinCount;
-        this.rule = props.rule;
-
         this.canvasContainerRef = React.createRef();
     }
 
@@ -52,37 +36,37 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
         canvas?.clearCanvas();
 
-        if (this.stepCount > 8) {
+        if (this.props.stepCount > 8) {
             canvas?.drawText(30, 50, 'too many recursion steps (max. 8) !');
             return;
         }
 
         let x = 200;
         let y = 220;
-        let length = 600 / 3 ** this.stepCount;
+        let length = 600 / 3 ** this.props.stepCount;
         let angle = 0;
 
         let recursionIterationCountText;
-        if (this.calculationType === 'recursive') {
-            recursionIterationCountText = `${this.recursionCount} recursions`;
-        } else if (this.calculationType === 'iterative') {
-            recursionIterationCountText = `${this.iterationCount} iterations`;
+        if (this.props.calculationType === 'recursive') {
+            recursionIterationCountText = `${this.props.recursionCount} recursions`;
+        } else if (this.props.calculationType === 'iterative') {
+            recursionIterationCountText = `${this.props.iterationCount} iterations`;
         }
 
         canvas?.drawTextLines(
             20,
             40,
-            this.calculationType,
-            `${this.rule.length} segments`,
+            this.props.calculationType,
+            `${this.props.rule.length} segments`,
             recursionIterationCountText || '',
-            `${this.joinCount} joins`,
+            `${this.props.joinCount} joins`,
         );
 
         const drawTime = measureTime(() => {
 
             canvas?.drawLineInit(x, y);
 
-            this.rule.forEach(element => {
+            this.props.rule.forEach(element => {
 
                 switch (element) {
                     case 'L':
@@ -107,17 +91,27 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         canvas?.drawTextLines(
             20,
             720,
-            `calculation time: ${this.calculationTime} ms`,
+            `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${drawTime} ms`,
         );
     }
 
     render() {
-        return <CanvasContainer
-            ref={this.canvasContainerRef}
-            canvasProps={this.canvasProps}
-        />
+        return (
+            <div>
+                <CanvasContainer
+                    ref={this.canvasContainerRef}
+                    canvasProps={this.props.canvasProps}
+                />
+
+                <div>{this.props.asdf}</div>
+            </div>
+        )
     }
 };
 
-export default DrawKochSnowflake;
+const mapStateToProps = (state: RootState) => ({
+    asdf: state.settings.asdf,
+});
+
+export default connect(mapStateToProps)(DrawKochSnowflake);

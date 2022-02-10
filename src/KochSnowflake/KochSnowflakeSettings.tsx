@@ -8,6 +8,7 @@ import {
 
 class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
 
+    // FIXME use this.props instead of additional properties !
     handleSubmit: SubmitHandler;
 
     constructor(props: InjectedFormProps) {
@@ -18,13 +19,15 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
-                <div>
-                    <label htmlFor="firstname">Vorname</label>
-                    <Field name="firstname" component="input" type="text" />
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
+            <>
+                <form onSubmit={this.handleSubmit}>
+                    <div>
+                        <label htmlFor="firstname">Vorname</label>
+                        <Field name="firstname" component="input" type="text" />
+                        <button type="submit">Submit</button>
+                    </div>
+                </form>
+            </>
         );
     }
 }

@@ -1,5 +1,13 @@
 import React from 'react';
+import {
+    connect,
+    DispatchProp,
+} from 'react-redux';
 
+import {
+    ADD_ONE,
+    MINUS_ONE,
+} from '../Store/actions';
 import measureTime from '../Utils/measureTime';
 import DrawKochSnowflake from './DrawKochSnowflake';
 import KochSnowflakeSettings from './KochSnowflakeSettings';
@@ -20,6 +28,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
     calculationTime = 0;
 
     constructor(props: KochSnowflakeProps) {
+
         super(props);
         this.calculate();
     }
@@ -107,6 +116,14 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
         console.log(values);
     }
 
+    minusOne = () => {
+        (this.props as DispatchProp).dispatch({ type: MINUS_ONE });
+    };
+
+    addOne = () => {
+        (this.props as DispatchProp).dispatch({ type: ADD_ONE });
+    };
+
     render() {
 
         return (
@@ -122,9 +139,18 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
                     joinCount={this.joinCount}
                     rule={this.rule}
                 />
+
+                <button onClick={this.minusOne} type="button">-</button>
+                <button onClick={this.addOne} type="button">+</button>
             </div>
         );
     }
 }
 
-export default KochSnowflake;
+const mapStateToProps = () => {
+    return {};
+}
+
+// NOTE or define dispatch functions on props
+// see https://react-redux.js.org/using-react-redux/connect-mapdispatch
+export default connect(mapStateToProps)(KochSnowflake);
