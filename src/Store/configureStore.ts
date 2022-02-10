@@ -2,23 +2,22 @@ import {
     applyMiddleware,
     compose,
     createStore,
+    Store,
 } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
 import monitorReducerEnhancer from './Enhancers/monitorReducer';
 import loggerMiddleware from './Middleware/logger';
-import rootReducer from './reducer';
+import rootReducer, { RootState } from './rootReducer';
 
-const configureStore = (preloadedState?: ReturnType<typeof rootReducer>) => {
-
-    // TODO see https://redux.js.org/usage/configuring-your-store/
+const configureStore = (preloadedState?: RootState): Store<RootState> => {
 
     const middlewareEnhancer = applyMiddleware(loggerMiddleware, thunkMiddleware);
     const composedEnhancers = compose(middlewareEnhancer, monitorReducerEnhancer);
 
-    const store = createStore(rootReducer, preloadedState, composedEnhancers);
-
-    return store;
+    // FIXME type of composedEnhancers !
+    // see also https://stackoverflow.com/questions/50451854/trouble-with-typescript-typing-for-store-enhancers-in-redux-4-0
+    return createStore(rootReducer, preloadedState, composedEnhancers as any);
 };
 
 export default configureStore;

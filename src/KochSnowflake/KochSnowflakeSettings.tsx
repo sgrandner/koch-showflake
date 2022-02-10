@@ -3,24 +3,14 @@ import {
     Field,
     InjectedFormProps,
     reduxForm,
-    SubmitHandler,
 } from 'redux-form';
 
 class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
 
-    // FIXME use this.props instead of additional properties !
-    handleSubmit: SubmitHandler;
-
-    constructor(props: InjectedFormProps) {
-        super(props);
-
-        this.handleSubmit = this.props.handleSubmit;
-    }
-
     render() {
         return (
             <>
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.props.handleSubmit}>
                     <div>
                         <label htmlFor="firstname">Vorname</label>
                         <Field name="firstname" component="input" type="text" />

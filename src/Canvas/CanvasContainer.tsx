@@ -8,18 +8,12 @@ type CanvasContainerProps = {
 
 class CanvasContainer extends React.Component<CanvasContainerProps> {
 
-    // FIXME use this.props instead of additional properties !
-    canvasProps: { width: string, height: string };
-
     canvasRef: RefObject<HTMLCanvasElement>;
     ctx: CanvasRenderingContext2D | undefined | null;
 
     constructor(props: CanvasContainerProps) {
 
         super(props);
-
-        this.canvasProps = props.canvasProps;
-
         this.canvasRef = React.createRef();
     }
 
@@ -98,7 +92,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     render() {
         return <canvas
             ref={this.canvasRef}
-            {...this.canvasProps}
+            {...this.props.canvasProps}
         />;
     }
 }

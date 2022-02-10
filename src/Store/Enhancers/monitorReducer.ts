@@ -9,10 +9,7 @@ import {
 
 const round = (number: number) => Math.round(number * 100) / 100
 
-// FIXME types !
-// see also https://stackoverflow.com/questions/50451854/trouble-with-typescript-typing-for-store-enhancers-in-redux-4-0
-
-const monitorReducerEnhancer: any =
+const monitorReducerEnhancer =
     (createStore: StoreCreator) =>
         <S, A extends Action, Ext, StateExt>(reducer: Reducer<S & StateExt, A>, initialState: PreloadedState<S & StateExt>, enhancer: StoreEnhancer<Ext>): Store<S & StateExt, A> & Ext => {
 

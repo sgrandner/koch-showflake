@@ -2,7 +2,7 @@ import React, { RefObject } from 'react';
 import { connect } from 'react-redux';
 
 import CanvasContainer from '../Canvas/CanvasContainer';
-import { RootState } from '../Store/reducer';
+import { RootState } from '../Store/rootReducer';
 import measureTime from '../Utils/measureTime';
 
 type DrawKochSnowflakeProps = {

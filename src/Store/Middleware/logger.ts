@@ -1,6 +1,6 @@
 import { Middleware } from 'redux';
 
-// typed middleware see https://stackoverflow.com/questions/45339448/how-do-you-create-strongly-typed-redux-middleware-in-typescript-from-reduxs-typ
+// NOTE typed middleware see https://stackoverflow.com/questions/45339448/how-do-you-create-strongly-typed-redux-middleware-in-typescript-from-reduxs-typ
 
 const logger: Middleware = (store) => (next) => (action) => {
 
