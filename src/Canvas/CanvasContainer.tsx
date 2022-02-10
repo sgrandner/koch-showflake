@@ -36,9 +36,9 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    drawText(x: number, y: number, text: string) {
+    drawText(x: number, y: number, text: string | undefined) {
 
-        if (!this.ctx) {
+        if (!this.ctx || !text) {
             return;
         }
 

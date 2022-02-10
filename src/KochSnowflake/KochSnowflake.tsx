@@ -7,7 +7,8 @@ import {
 import {
     ADD_ONE,
     MINUS_ONE,
-} from '../Store/actions';
+    setFirstnameAction,
+} from '../Store/settingsActions';
 import measureTime from '../Utils/measureTime';
 import DrawKochSnowflake from './DrawKochSnowflake';
 import KochSnowflakeSettings from './KochSnowflakeSettings';
@@ -114,6 +115,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
     submit(values: any) {
 
         console.log(values);
+        (this.props as DispatchProp).dispatch(setFirstnameAction.create({ firstname: values.firstname }));
     }
 
     minusOne = () => {
@@ -128,7 +130,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
         return (
             <div>
-                <KochSnowflakeSettings onSubmit={this.submit}/>
+                <KochSnowflakeSettings onSubmit={this.submit.bind(this)}/>
                 <DrawKochSnowflake
                     canvasProps={{ width: '1000', height: '800' }}
                     stepCount={this.stepCount}

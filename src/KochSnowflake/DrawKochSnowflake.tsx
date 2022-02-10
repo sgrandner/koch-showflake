@@ -15,6 +15,7 @@ type DrawKochSnowflakeProps = {
     joinCount: number;
     rule: string[];
     asdf: number;
+    firstname: string | undefined;
 };
 
 class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
@@ -23,6 +24,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
     // https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
 
     canvasContainerRef: RefObject<CanvasContainer>;
+    updateCount = 0;
 
     constructor(props: DrawKochSnowflakeProps) {
 
@@ -31,6 +33,15 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
     }
 
     componentDidMount() {
+        this.draw();
+    }
+
+    // FIXME maybe to often, trigger drawing on props change instead ?!
+    componentDidUpdate() {
+        this.draw();
+    }
+
+    draw() {
 
         const canvas = this.canvasContainerRef.current;
 
@@ -94,6 +105,8 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${drawTime} ms`,
         );
+
+        canvas?.drawText(200, 40, this.props.firstname);
     }
 
     render() {
@@ -105,6 +118,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 />
 
                 <div>{this.props.asdf}</div>
+                <div>update count: {++this.updateCount}</div>
             </div>
         )
     }
@@ -112,6 +126,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
 const mapStateToProps = (state: RootState) => ({
     asdf: state.settings.asdf,
+    firstname: state.settings.firstname,
 });
 
 export default connect(mapStateToProps)(DrawKochSnowflake);
