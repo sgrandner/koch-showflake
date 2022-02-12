@@ -1,57 +1,44 @@
+import { AnyAction } from 'redux';
+
 export const ADD_ONE = 'ADD_ONE';
 export const MINUS_ONE = 'MINUS_ONE';
 
-// const createAction = <T>(type: string) => {
-//     return {
-//         type,
-//         create: (payload: T) => {
-//             return {
-//                 type,
-//                 payload,
-//             };
-//         },
-//     };
-// };
+// NOTE action creators inspired by ngrx but not that complicated
 
-// export const setFirstnameAction = createAction<{ firstname: string }>('Set Firstname Action');
-
-// TODO several tests, delete when finished
-// export const SET_FIRSTNAME_ACTION = 'Set Firstname Action';
-// export const setFirstnameAction = (firstname: string) => {
-//     return {
-//         type: 'Set Firstname Action',
-//         payload: {
-//             firstname,
-//         },
-//     };
-// };
-
-type Creator<P extends any[] = any[], R extends object = object> = (...args: P) => R;
+type Creator<P extends object, R extends AnyAction = AnyAction> = (props: P) => R;
 
 interface TypedAction<T extends string> {
     readonly type: T
 }
 
-type ActionCreator<T extends string = string, C extends Creator = Creator> = C & TypedAction<T>;
+type ActionCreator<T extends string, P extends object, C extends Creator<P> = Creator<P>> = C & TypedAction<T>;
 
+interface PropsType<P> {
+    propsType: P,
+}
 
-const createAction = <T extends string, C extends Creator>(
+const props = <P extends object>(): PropsType<P> => {
+    return { propsType: undefined! };
+};
+
+const createAction = <T extends string, P extends object>(
     type: T,
-    config?: C,
-): ActionCreator<T> => {
+    config?: PropsType<P>,
+): ActionCreator<T, P> => {
 
-    let creator;
+    let creator: Creator<P>;
+
     if (!!config) {
-
-        creator = (...props: any[]) => (
+        creator = (props: P): AnyAction => (
             {
-                ...props,
+                payload: {
+                    ...props,
+                },
                 type,
             }
         );
     } else {
-
-        creator = () => (
+        creator = (): AnyAction => (
             {
                 type,
             }
@@ -61,37 +48,23 @@ const createAction = <T extends string, C extends Creator>(
     return Object.defineProperty(creator, 'type', {
         value: type,
         writable: false,
-    }) as ActionCreator<T>;
+    }) as ActionCreator<T, P>;
 };
 
-const setFirstnameAction = createAction('Set Firstname Action', { firstname: string });
+
+
+export const setFirstnameAction = createAction('Set Firstname Action', props<{ firstname: string }>());
+export const resetAction = createAction('Reset Action');
 
 const qwer = setFirstnameAction.type;
 const asdf = setFirstnameAction({ firstname: 'asdf' });
+const asdff = setFirstnameAction();                  // NOTE this should be wrong !
+
+const qwer2 = resetAction.type;
+const asdf2 = resetAction();
+const asdff2 = resetAction({ asdf: '423141' });      // FIXME this should be wrong !
 
 
+const yxcv = null;
 
-// class ActionCreator<T extends string, C extends Creator = Creator> {
-
-//     public type: T;
-//     private payload: P;
-
-//     constructor(type: T, payload: P) {
-//         this.type = type;
-//         this.payload = payload;
-//     }
-
-//     // static generate(type: T, payload: P) {
-//     //     return new ActionCreator(type, payload);
-//     // }
-
-//     getTypeAndPayload() {
-//         return {
-//             type: this.type,
-//             payload: this.payload,
-//         };
-//     }
-// }
-
-// export const setFirstnameAction = (payload: any) => new ActionCreator<{ firstname: string }>('Set Firstname Action', payload);
-// export const setFirstnameAction = (payload: any) => ActionCreator.generate('Set Firstname Action', payload);
+console.log(qwer, asdf, yxcv);
