@@ -1,35 +1,43 @@
-import { AnyAction } from 'redux';
-
 export const ADD_ONE = 'ADD_ONE';
 export const MINUS_ONE = 'MINUS_ONE';
 
-// NOTE action creators inspired by ngrx but not that complicated
-
-type Creator<P extends object, R extends AnyAction = AnyAction> = (props: P) => R;
+// NOTE typed action creators as implemented in ngrx but not that advanced
+// https://github.com/ngrx/platform
 
 interface TypedAction<T extends string> {
     readonly type: T
 }
 
-type ActionCreator<T extends string, P extends object, C extends Creator<P> = Creator<P>> = C & TypedAction<T>;
+type Creator<P extends any = any, R extends object = object> = (props: P) => R;
+
+type ActionCreator<T extends string = string, C extends Creator = Creator> = C & TypedAction<T>;
 
 interface PropsType<P> {
     propsType: P,
 }
 
-const props = <P extends object>(): PropsType<P> => {
+function props<P extends object>(): PropsType<P> {
     return { propsType: undefined! };
 };
 
-const createAction = <T extends string, P extends object>(
+function createAction<T extends string>(
     type: T,
-    config?: PropsType<P>,
-): ActionCreator<T, P> => {
+): ActionCreator<T, () => TypedAction<T>>;
 
-    let creator: Creator<P>;
+function createAction<T extends string, P extends object>(
+    type: T,
+    config: PropsType<P>,
+): ActionCreator<T, (props: P) => P & TypedAction<T>>;
 
-    if (!!config) {
-        creator = (props: P): AnyAction => (
+function createAction<T extends string>(
+    type: T,
+    propsType?: any,
+): ActionCreator<T> {
+
+    let creator: Creator;
+
+    if (!!propsType) {
+        creator = (props) => (
             {
                 payload: {
                     ...props,
@@ -38,7 +46,7 @@ const createAction = <T extends string, P extends object>(
             }
         );
     } else {
-        creator = (): AnyAction => (
+        creator = () => (
             {
                 type,
             }
@@ -48,23 +56,26 @@ const createAction = <T extends string, P extends object>(
     return Object.defineProperty(creator, 'type', {
         value: type,
         writable: false,
-    }) as ActionCreator<T, P>;
+    }) as ActionCreator<T>;
 };
-
-
 
 export const setFirstnameAction = createAction('Set Firstname Action', props<{ firstname: string }>());
 export const resetAction = createAction('Reset Action');
+export const fancyAction = createAction('Fancy Action', props<{ aaa: string, bbb: number }>());
 
 const qwer = setFirstnameAction.type;
 const asdf = setFirstnameAction({ firstname: 'asdf' });
-const asdff = setFirstnameAction();                  // NOTE this should be wrong !
+// const asdfa = setFirstnameAction({ firstnamee: 'asdf' });   // NOTE this should be wrong !
+// const asdff = setFirstnameAction();                         // NOTE this should be wrong !
 
 const qwer2 = resetAction.type;
 const asdf2 = resetAction();
-const asdff2 = resetAction({ asdf: '423141' });      // FIXME this should be wrong !
+// const asdff2 = resetAction({ asdf: '423141' });             // NOTE this should be wrong !
 
+const qwer3 = fancyAction.type;
+const asdf3 = fancyAction({ aaa: 'asdf', bbb: 42 });
+// const asdfa3 = fancyAction({ aaa: 'asdf', bbb: '42' });     // NOTE this should be wrong !
+// const asdfb3 = fancyAction({ aaa: 'asdf' });                // NOTE this should be wrong !
+// const asdff3 = fancyAction();                               // NOTE this should be wrong !
 
-const yxcv = null;
-
-console.log(qwer, asdf, yxcv);
+console.log(qwer, asdf, qwer2, asdf2, qwer3, asdf3);
