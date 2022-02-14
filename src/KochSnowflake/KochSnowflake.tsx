@@ -4,21 +4,19 @@ import {
     DispatchProp,
 } from 'react-redux';
 
-import {
-    ADD_ONE,
-    MINUS_ONE,
-    setFirstnameAction,
-} from '../Store/settingsActions';
+import { RootState } from '../Store/rootReducer';
+import { setStepCount } from '../Store/settingsActions';
 import measureTime from '../Utils/measureTime';
 import DrawKochSnowflake from './DrawKochSnowflake';
 import KochSnowflakeSettings from './KochSnowflakeSettings';
 
-type KochSnowflakeProps = {};
+type KochSnowflakeProps = {
+    stepCount: number;
+};
 
 class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
     elementaryRule: string[] = [ 'L', 'R', 'L' ];
-    stepCount = 6;
     calculationType: 'recursive' | 'iterative' = 'recursive';
 
     rule: string[] = [];
@@ -34,10 +32,15 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
         this.calculate();
     }
 
+    getSnapshotBeforeUpdate() {
+
+        this.calculate();
+    }
+
     calculate() {
 
         // NOTE stack size exceeds with stepCount = 9 (at least on my computer) !
-        if (this.stepCount > 8) {
+        if (this.props.stepCount > 8) {
             return;
         }
 
@@ -59,7 +62,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
     determineRuleRecursive(rule: string[], stepIndex: number): string[] {
 
-        if (stepIndex >= this.stepCount) {
+        if (stepIndex >= this.props.stepCount) {
             return rule;
         }
 
@@ -86,7 +89,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
         let currentRule = rule;
 
-        for (let stepIndex = 0; stepIndex < this.stepCount; stepIndex++) {
+        for (let stepIndex = 0; stepIndex < this.props.stepCount; stepIndex++) {
 
             this.iterationCount++;
             let joinCountPart = 0
@@ -114,17 +117,8 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
     submit(values: any) {
 
-        console.log(values);
-        (this.props as DispatchProp).dispatch(setFirstnameAction({ firstname: values.firstname }));
+        (this.props as unknown as DispatchProp).dispatch(setStepCount({ steps: Number(values.stepCount) }));
     }
-
-    minusOne = () => {
-        (this.props as DispatchProp).dispatch({ type: MINUS_ONE });
-    };
-
-    addOne = () => {
-        (this.props as DispatchProp).dispatch({ type: ADD_ONE });
-    };
 
     render() {
 
@@ -133,7 +127,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
                 <KochSnowflakeSettings onSubmit={this.submit.bind(this)}/>
                 <DrawKochSnowflake
                     canvasProps={{ width: '1000', height: '800' }}
-                    stepCount={this.stepCount}
+                    stepCount={this.props.stepCount}
                     calculationType={this.calculationType}
                     recursionCount={this.recursionCount}
                     iterationCount={this.iterationCount}
@@ -141,16 +135,16 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
                     joinCount={this.joinCount}
                     rule={this.rule}
                 />
-
-                <button onClick={this.minusOne} type="button">-</button>
-                <button onClick={this.addOne} type="button">+</button>
+                <button onClick={this.calculate.bind(this)}>Zeichnen</button>
             </div>
         );
     }
 }
 
-const mapStateToProps = () => {
-    return {};
+const mapStateToProps = (state: RootState) => {
+    return {
+        stepCount: state.settings.stepCount,
+    };
 }
 
 // NOTE or define dispatch functions on props

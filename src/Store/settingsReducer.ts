@@ -1,39 +1,23 @@
 import { AnyAction } from 'redux';
 
-import {
-    ADD_ONE,
-    MINUS_ONE,
-    setFirstnameAction,
-} from './settingsActions';
+import { setStepCount } from './settingsActions';
 
 export type SettingsState = {
-    asdf: number;
-    firstname: string | undefined;
+    stepCount: number;
 };
 
 const initialState: SettingsState = {
-    asdf: 0,
-    firstname: undefined,
+    stepCount: 1,
 };
 
 const settingsReducer = (state = initialState, action: AnyAction): SettingsState => {
 
     switch (action.type) {
-        case ADD_ONE:
-            return {
-                ...state,
-                asdf: state.asdf + 1
-            };
-        case MINUS_ONE:
-            return {
-                ...state,
-                asdf: state.asdf - 1
-            };
         // TODO payload not typed
-        case setFirstnameAction.type:
+        case setStepCount.type:
             return {
                 ...state,
-                firstname: action.payload.firstname,
+                stepCount: action.payload.steps,
             };
         default:
             return state;

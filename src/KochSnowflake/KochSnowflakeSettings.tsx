@@ -12,8 +12,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
             <>
                 <form onSubmit={this.props.handleSubmit}>
                     <div>
-                        <label htmlFor="firstname">Vorname</label>
-                        <Field name="firstname" component="input" type="text" />
+                        <label htmlFor="stepCount">Schritte</label>
+                        <Field name="stepCount" component="input" type="text" />
                         <button type="submit">Submit</button>
                     </div>
                 </form>

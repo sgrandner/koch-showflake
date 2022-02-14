@@ -2,7 +2,6 @@ import React, { RefObject } from 'react';
 import { connect } from 'react-redux';
 
 import CanvasContainer from '../Canvas/CanvasContainer';
-import { RootState } from '../Store/rootReducer';
 import measureTime from '../Utils/measureTime';
 
 type DrawKochSnowflakeProps = {
@@ -14,8 +13,6 @@ type DrawKochSnowflakeProps = {
     calculationTime: number;
     joinCount: number;
     rule: string[];
-    asdf: number;
-    firstname: string | undefined;
 };
 
 class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
@@ -105,8 +102,6 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${drawTime} ms`,
         );
-
-        canvas?.drawText(200, 40, this.props.firstname);
     }
 
     render() {
@@ -117,16 +112,13 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                     canvasProps={this.props.canvasProps}
                 />
 
-                <div>{this.props.asdf}</div>
                 <div>update count: {++this.updateCount}</div>
             </div>
         )
     }
 };
 
-const mapStateToProps = (state: RootState) => ({
-    asdf: state.settings.asdf,
-    firstname: state.settings.firstname,
+const mapStateToProps = (/* state: RootState */) => ({
 });
 
 export default connect(mapStateToProps)(DrawKochSnowflake);
