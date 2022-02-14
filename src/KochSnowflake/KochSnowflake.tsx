@@ -115,7 +115,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
     submit(values: any) {
 
         console.log(values);
-        (this.props as DispatchProp).dispatch(setFirstnameAction.create({ firstname: values.firstname }));
+        (this.props as DispatchProp).dispatch(setFirstnameAction({ firstname: values.firstname }));
     }
 
     minusOne = () => {
