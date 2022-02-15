@@ -26,17 +26,6 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
     joinCount = 0;
     calculationTime = 0;
 
-    constructor(props: KochSnowflakeProps) {
-
-        super(props);
-        this.calculate();
-    }
-
-    getSnapshotBeforeUpdate() {
-
-        this.calculate();
-    }
-
     calculate() {
 
         // NOTE stack size exceeds with stepCount = 9 (at least on my computer) !
@@ -122,6 +111,8 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
     render() {
 
+        this.calculate();
+
         return (
             <div>
                 <KochSnowflakeSettings onSubmit={this.submit.bind(this)}/>
@@ -135,7 +126,6 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
                     joinCount={this.joinCount}
                     rule={this.rule}
                 />
-                <button onClick={this.calculate.bind(this)}>Zeichnen</button>
             </div>
         );
     }
