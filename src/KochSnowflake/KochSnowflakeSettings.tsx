@@ -1,3 +1,5 @@
+import './KochSnowflakeSettings.css';
+
 import React from 'react';
 import {
     Field,
@@ -11,9 +13,13 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
         return (
             <>
                 <form onSubmit={this.props.handleSubmit}>
-                    <div>
+                    <div className='settings'>
                         <label htmlFor="stepCount">Schritte</label>
-                        <Field name="stepCount" component="input" type="text" />
+                        <Field className='settings__input' name="stepCount" component="input" type="text" />
+
+                        <label htmlFor="elementaryRuleString">Regel</label>
+                        <Field className='settings__input' name="elementaryRuleString" component="input" type="text" />
+
                         <button type="submit">Submit</button>
                     </div>
                 </form>

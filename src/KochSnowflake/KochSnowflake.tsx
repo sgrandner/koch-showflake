@@ -5,18 +5,19 @@ import {
 } from 'react-redux';
 
 import { RootState } from '../Store/rootReducer';
-import { setStepCount } from '../Store/settingsActions';
+import { setKochSnowflakeSettings } from '../Store/settingsActions';
 import measureTime from '../Utils/measureTime';
 import DrawKochSnowflake from './DrawKochSnowflake';
 import KochSnowflakeSettings from './KochSnowflakeSettings';
 
 type KochSnowflakeProps = {
     stepCount: number;
+    elementaryRuleString: string;
 };
 
 class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
-    elementaryRule: string[] = [ 'L', 'R', 'L' ];
+    elementaryRule: string[] = [];
     calculationType: 'recursive' | 'iterative' = 'recursive';
 
     rule: string[] = [];
@@ -29,7 +30,13 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
     calculate() {
 
         // NOTE stack size exceeds with stepCount = 9 (at least on my computer) !
-        if (this.props.stepCount > 8) {
+        if (!this.props.stepCount || this.props.stepCount > 8) {
+            return;
+        }
+
+        this.elementaryRule = this.props.elementaryRuleString?.split('');
+
+        if (!this.elementaryRule || this.elementaryRule.length === 0) {
             return;
         }
 
@@ -106,7 +113,10 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
     submit(values: any) {
 
-        (this.props as unknown as DispatchProp).dispatch(setStepCount({ steps: Number(values.stepCount) }));
+        (this.props as unknown as DispatchProp).dispatch(setKochSnowflakeSettings({
+            stepCount: Number(values.stepCount),
+            elementaryRuleString: values.elementaryRuleString,
+        }));
     }
 
     render() {
@@ -134,6 +144,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 const mapStateToProps = (state: RootState) => {
     return {
         stepCount: state.settings.stepCount,
+        elementaryRuleString: state.settings.elementaryRuleString,
     };
 }
 

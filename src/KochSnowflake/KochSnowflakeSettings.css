@@ -1,0 +1,10 @@
+.settings {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.settings__input {
+    margin-bottom: 10px;
+}

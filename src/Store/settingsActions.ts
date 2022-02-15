@@ -3,4 +3,7 @@ import {
     defineProps,
 } from './createAction';
 
-export const setStepCount = createAction('Set Step Count', defineProps<{ steps: number }>());
+export const setKochSnowflakeSettings = createAction('Set Koch Snowflake Settings', defineProps<{
+    stepCount: number,
+    elementaryRuleString: string,
+}>());

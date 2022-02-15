@@ -32,7 +32,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillStyle = '#000000';
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
@@ -43,7 +43,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         }
 
         this.ctx.font = '32px serif';
-        this.ctx.fillStyle = '#000000';
+        this.ctx.fillStyle = '#ffffff';
         this.ctx.fillText(text, x, y);
     }
 
@@ -54,7 +54,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         }
 
         this.ctx.font = '32px serif';
-        this.ctx.fillStyle = '#000000';
+        this.ctx.fillStyle = '#ffffff';
 
         textLines.forEach((text, index) => {
             this.ctx?.fillText(text, x, y + index * 40);
@@ -67,6 +67,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
+        this.ctx.strokeStyle = '#ffffff';
         this.ctx.beginPath();
         this.ctx.moveTo(x, y);
     }
