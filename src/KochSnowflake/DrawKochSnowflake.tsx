@@ -2,17 +2,21 @@ import React, { RefObject } from 'react';
 import { connect } from 'react-redux';
 
 import CanvasContainer from '../Canvas/CanvasContainer';
+import { RootState } from '../Store/rootReducer';
 import measureTime from '../Utils/measureTime';
 
 type DrawKochSnowflakeProps = {
     canvasProps: { width: string, height: string };
     stepCount: number;
     calculationType: 'recursive' | 'iterative';
+    rule: string[];
+    anglePlus?: number;
+    angleMinus?: number;
+
     recursionCount: number;
     iterationCount: number;
     calculationTime: number;
     joinCount: number;
-    rule: string[];
 };
 
 class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
@@ -70,6 +74,9 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             `${this.props.joinCount} joins`,
         );
 
+        const anglePlus = this.props.anglePlus || 0;
+        const angleMinus = this.props.angleMinus || 0;
+
         const drawTime = measureTime(() => {
 
             canvas?.drawLineInit(x, y);
@@ -78,10 +85,10 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
                 switch (element) {
                     case 'L':
-                        angle += Math.PI / 3.0;
+                        angle += anglePlus;
                         break;
                     case 'R':
-                        angle -= 2.0 * Math.PI / 3.0;
+                        angle += angleMinus;
                         break;
                     default:
                         break;
@@ -118,7 +125,9 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
     }
 };
 
-const mapStateToProps = (/* state: RootState */) => ({
+const mapStateToProps = (state: RootState) => ({
+    anglePlus: state.settings.anglePlus,
+    angleMinus: state.settings.angleMinus,
 });
 
 export default connect(mapStateToProps)(DrawKochSnowflake);
