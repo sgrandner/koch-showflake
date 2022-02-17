@@ -4,12 +4,16 @@ import React, { RefObject } from 'react';
 
 type CanvasContainerProps = {
     canvasProps: { width: string, height: string };
+    onMouseDrag?: (drag: { x: number, y: number }) => void | undefined;
+    onMouseDragFinish?: () => void | undefined;
 };
 
 class CanvasContainer extends React.Component<CanvasContainerProps> {
 
     canvasRef: RefObject<HTMLCanvasElement>;
     ctx: CanvasRenderingContext2D | undefined | null;
+
+    dragActive = false;
 
     constructor(props: CanvasContainerProps) {
 
@@ -90,10 +94,43 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.stroke();
     }
 
+    mouseDown() {
+        this.dragActive = true;
+    }
+
+    mouseUp() {
+        this.dragActive = false;
+
+        if (!this.props?.onMouseDragFinish) {
+            return;
+        }
+
+        this.props.onMouseDragFinish();
+    }
+
+    mouseMove($event: React.MouseEvent) {
+
+        if (!this.dragActive) {
+            return;
+        }
+
+        if (!this.props?.onMouseDrag) {
+            return;
+        }
+
+        this.props.onMouseDrag({
+            x: $event?.movementX,
+            y: $event?.movementY,
+        });
+    }
+
     render() {
         return <canvas
             ref={this.canvasRef}
             {...this.props.canvasProps}
+            onMouseDown={this.mouseDown.bind(this)}
+            onMouseUp={this.mouseUp.bind(this)}
+            onMouseMove={this.mouseMove.bind(this)}
         />;
     }
 }
