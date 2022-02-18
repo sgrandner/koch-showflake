@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import CanvasContainer from '../Canvas/CanvasContainer';
 import { RootState } from '../Store/rootReducer';
 import measureTime from '../Utils/measureTime';
+import { MAX_STEPS } from './KochSnowflake';
 
 enum Zoom {
     IN,
@@ -14,7 +15,7 @@ type DrawKochSnowflakeProps = {
     canvasProps: { width: string, height: string };
     stepCount: number;
     calculationType: 'recursive' | 'iterative';
-    rule: string[];
+    rule: string;
     anglePlus?: number;
     angleMinus?: number;
 
@@ -63,8 +64,8 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
         canvas?.clearCanvas();
 
-        if (this.props.stepCount > 8) {
-            canvas?.drawText(30, 50, 'too many recursion steps (max. 8) !');
+        if (this.props.stepCount > MAX_STEPS) {
+            canvas?.drawText(30, 50, `too many recursion steps (max. ${MAX_STEPS}) !`);
             return;
         }
 
@@ -96,7 +97,9 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
             canvas?.drawLineInit(x, y);
 
-            this.props.rule.forEach(element => {
+            for (let i = 0; i < this.props.rule.length; i++) {
+
+                const element = this.props.rule.charAt(i);
 
                 switch (element) {
                     case 'L':
@@ -113,7 +116,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 y -= Math.sin(angle) * length;
 
                 canvas?.drawLine(x, y);
-            });
+            }
 
             canvas?.drawLineFinish();
         });

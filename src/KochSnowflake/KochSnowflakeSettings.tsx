@@ -14,8 +14,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
     componentWillMount() {
         this.props.initialize({
             stepCount: 4,
-            startWordString: 'RR',
-            elementaryRuleString: 'LRL',
+            startWord: 'RR',
+            elementaryRule: 'LRL',
             anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
             angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
         });
@@ -29,11 +29,11 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
                         <label htmlFor="stepCount">Schritte</label>
                         <Field className='settings__input' name="stepCount" component="input" type="text" />
 
-                        <label htmlFor="startWordString">Startwort</label>
-                        <Field className='settings__input' name="startWordString" component="input" type="text" />
+                        <label htmlFor="startWord">Startwort</label>
+                        <Field className='settings__input' name="startWord" component="input" type="text" />
 
-                        <label htmlFor="elementaryRuleString">Regel</label>
-                        <Field className='settings__input' name="elementaryRuleString" component="input" type="text" />
+                        <label htmlFor="elementaryRule">Regel</label>
+                        <Field className='settings__input' name="elementaryRule" component="input" type="text" />
 
                         <label htmlFor="anglePlus">Winkel +</label>
                         <Field className='settings__input' name="anglePlus" component="input" type="text" />
