@@ -15,7 +15,7 @@ type DrawKochSnowflakeProps = {
     canvasProps: { width: string, height: string };
     stepCount: number;
     calculationType: 'recursive' | 'iterative';
-    rule: string;
+    resultRule: string;
     anglePlus?: number;
     angleMinus?: number;
 
@@ -85,7 +85,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             20,
             40,
             this.props.calculationType,
-            `${this.props.rule.length} segments`,
+            `${this.props.resultRule.length} segments`,
             recursionIterationCountText || '',
             `${this.props.joinCount} joins`,
         );
@@ -97,9 +97,9 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
             canvas?.drawLineInit(x, y);
 
-            for (let i = 0; i < this.props.rule.length; i++) {
+            for (let i = 0; i < this.props.resultRule.length; i++) {
 
-                const element = this.props.rule.charAt(i);
+                const element = this.props.resultRule.charAt(i);
 
                 switch (element) {
                     case '+':

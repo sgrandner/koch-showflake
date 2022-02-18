@@ -5,7 +5,8 @@ import { setKochSnowflakeSettings } from './settingsActions';
 export type SettingsState = {
     stepCount: number;
     startWord: string;
-    elementaryRule: string;
+    ruleA: string;
+    ruleB: string;
     anglePlus: number;
     angleMinus: number;
 };
@@ -13,7 +14,8 @@ export type SettingsState = {
 const initialState: SettingsState = {
     stepCount: 0,
     startWord: '',
-    elementaryRule: '',
+    ruleA: '',
+    ruleB: '',
     anglePlus: 0,
     angleMinus: 0,
 };
@@ -27,7 +29,8 @@ const settingsReducer = (state = initialState, action: AnyAction): SettingsState
                 ...state,
                 stepCount: action.payload.stepCount,
                 startWord: action.payload.startWord,
-                elementaryRule: action.payload.elementaryRule,
+                ruleA: action.payload.ruleA,
+                ruleB: action.payload.ruleB,
                 anglePlus: action.payload.anglePlus,
                 angleMinus: action.payload.angleMinus,
             };

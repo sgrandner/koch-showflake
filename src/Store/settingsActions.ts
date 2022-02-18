@@ -6,7 +6,8 @@ import {
 export const setKochSnowflakeSettings = createAction('Set Koch Snowflake Settings', defineProps<{
     stepCount: number,
     startWord: string,
-    elementaryRule: string,
+    ruleA: string,
+    ruleB: string,
     anglePlus: number,
     angleMinus: number,
 }>());

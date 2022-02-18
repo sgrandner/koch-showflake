@@ -13,7 +13,8 @@ import KochSnowflakeSettings, { RAD_TO_DEG } from './KochSnowflakeSettings';
 type KochSnowflakeProps = {
     stepCount: number;
     startWord: string;
-    elementaryRule: string;
+    ruleA: string;
+    ruleB: string;
 };
 
 export const MAX_STEPS = 13;
@@ -22,7 +23,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
     calculationType: 'recursive' | 'iterative' = 'recursive';
 
-    rule: string = '';
+    resultRule: string = '';
 
     recursionCount = 0;
     iterationCount = 0;
@@ -35,48 +36,47 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
             return;
         }
 
-        if (
-            this.props.startWord === null ||
-            this.props.startWord === undefined ||
-            !this.props.elementaryRule ||
-            this.props.elementaryRule.length === 0
-        ) {
-            return;
-        }
-
         if (this.calculationType === 'recursive') {
 
             this.calculationTime = measureTime(() => {
-                this.rule = this.determineRuleRecursive(this.props.startWord, 0);
+                this.resultRule = this.determineRuleRecursive(this.props.startWord || '', 0);
             });
 
         } else if (this.calculationType === 'iterative') {
 
             this.calculationTime = measureTime(() => {
-                this.rule = this.determineRuleIterative(this.props.startWord);
+                this.resultRule = this.determineRuleIterative(this.props.startWord || '');
             });
         }
     }
 
-    determineRuleRecursive(rule: string, stepIndex: number): string {
+    determineRuleRecursive(resultRule: string, stepIndex: number): string {
 
         if (stepIndex >= this.props.stepCount) {
-            return rule;
+            return resultRule;
         }
 
         this.recursionCount++;
 
-        const nextRulePart = this.determineRuleRecursive(this.props.elementaryRule, ++stepIndex);
+        stepIndex++;
+        const nextRulePartA = this.determineRuleRecursive(this.props.ruleA, stepIndex);
+        const nextRulePartB = this.determineRuleRecursive(this.props.ruleB, stepIndex);
 
         let nextRule = '';
-        for (let i = 0; i < rule.length; i++) {
+        for (let i = 0; i < resultRule.length; i++) {
 
-            const element = rule.charAt(i);
+            const element = resultRule.charAt(i);
 
-            if (element === 'A') {
-                nextRule = nextRule.concat(nextRulePart);
-            } else {
-                nextRule = nextRule.concat(element);
+            switch (element) {
+                case 'A':
+                    nextRule = nextRule.concat(nextRulePartA);
+                    break;
+                case 'B':
+                    nextRule = nextRule.concat(nextRulePartB);
+                    break;
+                default:
+                    nextRule = nextRule.concat(element);
+                    break;
             }
 
             this.joinCount++;
@@ -85,9 +85,9 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
         return nextRule;
     }
 
-    determineRuleIterative(rule: string): string {
+    determineRuleIterative(resultRule: string): string {
 
-        let currentRule = rule;
+        let currentRule = resultRule;
 
         for (let stepIndex = 0; stepIndex < this.props.stepCount; stepIndex++) {
 
@@ -100,10 +100,16 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
                 const element = currentRule.charAt(i);
 
-                if (element === 'A') {
-                    nextRule = nextRule.concat(this.props.elementaryRule);
-                } else {
-                    nextRule = nextRule.concat(element);
+                switch (element) {
+                    case 'A':
+                        nextRule = nextRule.concat(this.props.ruleA);
+                        break;
+                    case 'B':
+                        nextRule = nextRule.concat(this.props.ruleB);
+                        break;
+                    default:
+                        nextRule = nextRule.concat(element);
+                        break;
                 }
 
                 joinCountPart++;
@@ -122,7 +128,8 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
         (this.props as unknown as DispatchProp).dispatch(setKochSnowflakeSettings({
             stepCount: Number(values.stepCount),
             startWord: values.startWord,
-            elementaryRule: values.elementaryRule,
+            ruleA: values.ruleA,
+            ruleB: values.ruleB,
             anglePlus: Number(values.anglePlus) / RAD_TO_DEG,
             angleMinus: Number(values.angleMinus) / RAD_TO_DEG,
         }));
@@ -139,7 +146,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
                     canvasProps={{ width: '1000', height: '800' }}
                     stepCount={this.props.stepCount}
                     calculationType={this.calculationType}
-                    rule={this.rule}
+                    resultRule={this.resultRule}
                     recursionCount={this.recursionCount}
                     iterationCount={this.iterationCount}
                     calculationTime={this.calculationTime}
@@ -154,7 +161,8 @@ const mapStateToProps = (state: RootState) => {
     return {
         stepCount: state.settings.stepCount,
         startWord: state.settings.startWord,
-        elementaryRule: state.settings.elementaryRule,
+        ruleA: state.settings.ruleA,
+        ruleB: state.settings.ruleB,
     };
 }
 
