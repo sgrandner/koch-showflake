@@ -102,20 +102,17 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 const element = this.props.rule.charAt(i);
 
                 switch (element) {
-                    case 'L':
+                    case '+':
                         angle += anglePlus;
                         break;
-                    case 'R':
+                    case '-':
                         angle += angleMinus;
                         break;
                     default:
-                        break;
+                        x += Math.cos(angle) * length;
+                        y -= Math.sin(angle) * length;
+                        canvas?.drawLine(x, y);
                 }
-
-                x += Math.cos(angle) * length;
-                y -= Math.sin(angle) * length;
-
-                canvas?.drawLine(x, y);
             }
 
             canvas?.drawLineFinish();

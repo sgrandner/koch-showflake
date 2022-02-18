@@ -14,8 +14,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
     componentWillMount() {
         this.props.initialize({
             stepCount: 4,
-            startWord: 'RR',
-            elementaryRule: 'LRL',
+            startWord: 'A-A-A',
+            elementaryRule: 'A+A-A+A',
             anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
             angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
         });

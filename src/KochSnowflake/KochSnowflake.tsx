@@ -31,8 +31,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
     calculate() {
 
-        // NOTE stack size exceeds with stepCount = 9 (at least on my computer) !
-        if (!this.props.stepCount || this.props.stepCount > MAX_STEPS) {
+        if (!(this.props.stepCount >= 0 && this.props.stepCount < MAX_STEPS)) {
             return;
         }
 
@@ -74,12 +73,14 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
             const element = rule.charAt(i);
 
-            this.joinCount++;
-            nextRule = nextRule.concat(nextRulePart).concat(element);
-        }
+            if (element === 'A') {
+                nextRule = nextRule.concat(nextRulePart);
+            } else {
+                nextRule = nextRule.concat(element);
+            }
 
-        this.joinCount++;
-        nextRule = nextRule.concat(nextRulePart);
+            this.joinCount++;
+        }
 
         return nextRule;
     }
@@ -95,18 +96,20 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
             let nextRule = '';
 
-            for (let i = 0; i < rule.length; i++) {
+            for (let i = 0; i < currentRule.length; i++) {
 
-                const element = rule.charAt(i);
+                const element = currentRule.charAt(i);
+
+                if (element === 'A') {
+                    nextRule = nextRule.concat(this.props.elementaryRule);
+                } else {
+                    nextRule = nextRule.concat(element);
+                }
 
                 joinCountPart++;
-                nextRule = nextRule.concat(this.props.elementaryRule).concat(element);
             }
 
             this.joinCount += joinCountPart;
-
-            this.joinCount++;
-            nextRule = nextRule.concat(this.props.elementaryRule);
 
             currentRule = nextRule;
         }
