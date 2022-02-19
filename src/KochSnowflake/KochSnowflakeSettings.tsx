@@ -9,11 +9,13 @@ import {
     reduxForm,
 } from 'redux-form';
 
+import { RootState } from '../Store/rootReducer';
 import { MAX_STEPS } from './KochSnowflake';
 
 export const RAD_TO_DEG = 180.0 / Math.PI;
 
 type KochSnowflakeSettingsProps = {
+    preset: string;
     stepCount: number;
     anglePlus: number;
     angleMinus: number;
@@ -22,25 +24,49 @@ type KochSnowflakeSettingsProps = {
 class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnowflakeSettingsProps> {
 
     componentWillMount() {
-        // TODO preset selector
-        // preset Koch snowflake
-        this.props.initialize({
-            stepCount: 4,
-            startWord: 'A-A-A',
-            ruleA: 'A+A-A+A',
-            ruleB: '',
-            anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
-            angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
-        });
-        // preset Sierpinski triangle
-        // this.props.initialize({
-        //     stepCount: 4,
-        //     startWord: '+A-A-B',
-        //     ruleA: 'AA',
-        //     ruleB: 'B-A++B++A-B',
-        //     anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
-        //     angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
-        // });
+        this.setPreset();
+    }
+
+    componentDidUpdate(prevProps: InjectedFormProps & KochSnowflakeSettingsProps) {
+
+        if (prevProps.preset !== this.props.preset) {
+            this.setPreset();
+        }
+    }
+
+    setPreset() {
+
+        let initalValues = {};
+
+        switch (this.props.preset) {
+
+            case 'sierpinski':
+                initalValues = {
+                    preset: 'sierpinski',
+                    stepCount: 4,
+                    startWord: '+A-A-B',
+                    ruleA: 'AA',
+                    ruleB: 'B-A++B++A-B',
+                    anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
+                    angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
+                };
+                break;
+
+            case 'koch':
+            default:
+                initalValues = {
+                    preset: 'koch',
+                    stepCount: 4,
+                    startWord: 'A-A-A',
+                    ruleA: 'A+A-A+A',
+                    ruleB: '',
+                    anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
+                    angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
+                };
+                break;
+        }
+
+        this.props.initialize(initalValues);
     }
 
     increaseStepCount() {
@@ -86,6 +112,11 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
             <>
                 <form onSubmit={this.props.handleSubmit}>
                     <div className='settings'>
+                        <Field name="preset" component="select">
+                            <option value="koch">Kochsche Schneeflocke</option>
+                            <option value="sierpinski">Sierpinski Dreieck</option>
+                        </Field>
+
                         <label htmlFor="stepCount">Schritte</label>
                         <Field className='settings__input' name="stepCount" component="input" type="text" />
                         <button onClick={this.increaseStepCount.bind(this)}>+</button>
@@ -110,7 +141,7 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                         <button onClick={this.increaseAngleMinus.bind(this)}>+</button>
                         <button onClick={this.decreaseAngleMinus.bind(this)}>-</button>
 
-                        <button type="submit">Submit</button>
+                        <button type="submit">Berechnen & Zeichnen</button>
                     </div>
                 </form>
             </>
@@ -120,12 +151,14 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
 
 // NOTE decorate class component KochSnowflakeSettings with connect method
 //      connects redux store with props of component in order to read store values
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState) => {
     const selector = formValueSelector('kochSettings');
+    const preset = selector(state, 'preset');
     const stepCount = Number(selector(state, 'stepCount'));
     const anglePlus = Number(selector(state, 'anglePlus'));
     const angleMinus = Number(selector(state, 'angleMinus'));
     return {
+        preset,
         stepCount,
         anglePlus,
         angleMinus,
