@@ -1,15 +1,25 @@
 import './KochSnowflakeSettings.css';
 
 import React from 'react';
+import { connect } from 'react-redux';
 import {
     Field,
+    formValueSelector,
     InjectedFormProps,
     reduxForm,
 } from 'redux-form';
 
+import { MAX_STEPS } from './KochSnowflake';
+
 export const RAD_TO_DEG = 180.0 / Math.PI;
 
-class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
+type KochSnowflakeSettingsProps = {
+    stepCount: number;
+    anglePlus: number;
+    angleMinus: number;
+};
+
+class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnowflakeSettingsProps> {
 
     componentWillMount() {
         // TODO preset selector
@@ -33,6 +43,44 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
         // });
     }
 
+    increaseStepCount() {
+
+        if (this.props.stepCount >= MAX_STEPS) {
+            return;
+        }
+
+        this.props.change('stepCount', this.props.stepCount + 1);
+    }
+
+    decreaseStepCount() {
+
+        if (this.props.stepCount <= 0) {
+            return;
+        }
+
+        this.props.change('stepCount', this.props.stepCount - 1);
+    }
+
+    increaseAnglePlus() {
+
+        this.props.change('anglePlus', this.props.anglePlus + 1);
+    }
+
+    decreaseAnglePlus() {
+
+        this.props.change('anglePlus', this.props.anglePlus - 1);
+    }
+
+    increaseAngleMinus() {
+
+        this.props.change('angleMinus', this.props.angleMinus + 1);
+    }
+
+    decreaseAngleMinus() {
+
+        this.props.change('angleMinus', this.props.angleMinus - 1);
+    }
+
     render() {
         return (
             <>
@@ -40,6 +88,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
                     <div className='settings'>
                         <label htmlFor="stepCount">Schritte</label>
                         <Field className='settings__input' name="stepCount" component="input" type="text" />
+                        <button onClick={this.increaseStepCount.bind(this)}>+</button>
+                        <button onClick={this.decreaseStepCount.bind(this)}>-</button>
 
                         <label htmlFor="startWord">Startwort</label>
                         <Field className='settings__input' name="startWord" component="input" type="text" />
@@ -52,9 +102,13 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
 
                         <label htmlFor="anglePlus">Winkel +</label>
                         <Field className='settings__input' name="anglePlus" component="input" type="text" />
+                        <button onClick={this.increaseAnglePlus.bind(this)}>+</button>
+                        <button onClick={this.decreaseAnglePlus.bind(this)}>-</button>
 
                         <label htmlFor="angleMinus">Winkel -</label>
                         <Field className='settings__input' name="angleMinus" component="input" type="text" />
+                        <button onClick={this.increaseAngleMinus.bind(this)}>+</button>
+                        <button onClick={this.decreaseAngleMinus.bind(this)}>-</button>
 
                         <button type="submit">Submit</button>
                     </div>
@@ -64,6 +118,23 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps> {
     }
 }
 
+// NOTE decorate class component KochSnowflakeSettings with connect method
+//      connects redux store with props of component in order to read store values
+const mapStateToProps = (state: any) => {
+    const selector = formValueSelector('kochSettings');
+    const stepCount = Number(selector(state, 'stepCount'));
+    const anglePlus = Number(selector(state, 'anglePlus'));
+    const angleMinus = Number(selector(state, 'angleMinus'));
+    return {
+        stepCount,
+        anglePlus,
+        angleMinus,
+    };
+};
+const KochSnowflakeSettingsConnected = connect(mapStateToProps)(KochSnowflakeSettings);
+
+// NOTE decorate KochSnowflakeSettingsConnected with reduxform
+//      connects form with redux store
 export default reduxForm({
     form: 'kochSettings',
-})(KochSnowflakeSettings);
+})(KochSnowflakeSettingsConnected);;
