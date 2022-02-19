@@ -6,9 +6,10 @@ import {
 
 import { RootState } from '../Store/rootReducer';
 import { setKochSnowflakeSettings } from '../Store/settingsActions';
+import { angleDegToRad } from '../Utils/angleUtils';
 import measureTime from '../Utils/measureTime';
 import DrawKochSnowflake from './DrawKochSnowflake';
-import KochSnowflakeSettings, { RAD_TO_DEG } from './KochSnowflakeSettings';
+import KochSnowflakeSettings from './KochSnowflakeSettings';
 
 type KochSnowflakeProps = {
     stepCount: number;
@@ -130,8 +131,8 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
             startWord: values.startWord,
             ruleA: values.ruleA,
             ruleB: values.ruleB,
-            anglePlus: Number(values.anglePlus) / RAD_TO_DEG,
-            angleMinus: Number(values.angleMinus) / RAD_TO_DEG,
+            anglePlus: angleDegToRad(Number(values.anglePlus)),
+            angleMinus: angleDegToRad(Number(values.angleMinus)),
         }));
     }
 

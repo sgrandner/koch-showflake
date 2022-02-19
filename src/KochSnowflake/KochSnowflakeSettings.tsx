@@ -10,9 +10,8 @@ import {
 } from 'redux-form';
 
 import { RootState } from '../Store/rootReducer';
+import { angleRadToDeg } from '../Utils/angleUtils';
 import { MAX_STEPS } from './KochSnowflake';
-
-export const RAD_TO_DEG = 180.0 / Math.PI;
 
 type KochSnowflakeSettingsProps = {
     preset: string;
@@ -23,18 +22,18 @@ type KochSnowflakeSettingsProps = {
 
 class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnowflakeSettingsProps> {
 
-    componentWillMount() {
+    componentWillMount(): void {
         this.setPreset();
     }
 
-    componentDidUpdate(prevProps: InjectedFormProps & KochSnowflakeSettingsProps) {
+    componentDidUpdate(prevProps: InjectedFormProps & KochSnowflakeSettingsProps): void {
 
         if (prevProps.preset !== this.props.preset) {
             this.setPreset();
         }
     }
 
-    setPreset() {
+    setPreset(): void {
 
         let initalValues = {};
 
@@ -47,8 +46,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                     startWord: '+A-A-B',
                     ruleA: 'AA',
                     ruleB: 'B-A++B++A-B',
-                    anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
-                    angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
+                    anglePlus: angleRadToDeg(Math.PI / 3.0),
+                    angleMinus: angleRadToDeg(-2.0 * Math.PI / 3.0),
                 };
                 break;
 
@@ -60,8 +59,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                     startWord: 'A-A-A',
                     ruleA: 'A+A-A+A',
                     ruleB: '',
-                    anglePlus: Math.round(Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
-                    angleMinus: Math.round(-2.0 * Math.PI / 3.0 * RAD_TO_DEG * 100) / 100,
+                    anglePlus: angleRadToDeg(Math.PI / 3.0),
+                    angleMinus: angleRadToDeg(-2.0 * Math.PI / 3.0),
                 };
                 break;
         }
@@ -69,7 +68,7 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
         this.props.initialize(initalValues);
     }
 
-    increaseStepCount() {
+    increaseStepCount(): void {
 
         if (this.props.stepCount >= MAX_STEPS) {
             return;
@@ -78,7 +77,7 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
         this.props.change('stepCount', this.props.stepCount + 1);
     }
 
-    decreaseStepCount() {
+    decreaseStepCount(): void {
 
         if (this.props.stepCount <= 0) {
             return;
@@ -87,22 +86,22 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
         this.props.change('stepCount', this.props.stepCount - 1);
     }
 
-    increaseAnglePlus() {
+    increaseAnglePlus(): void {
 
         this.props.change('anglePlus', this.props.anglePlus + 1);
     }
 
-    decreaseAnglePlus() {
+    decreaseAnglePlus(): void {
 
         this.props.change('anglePlus', this.props.anglePlus - 1);
     }
 
-    increaseAngleMinus() {
+    increaseAngleMinus(): void {
 
         this.props.change('angleMinus', this.props.angleMinus + 1);
     }
 
-    decreaseAngleMinus() {
+    decreaseAngleMinus(): void {
 
         this.props.change('angleMinus', this.props.angleMinus - 1);
     }
