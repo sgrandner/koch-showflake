@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import CanvasContainer from '../Canvas/CanvasContainer';
 import { RootState } from '../Store/rootReducer';
 import measureTime from '../Utils/measureTime';
+import { calculatePath } from './calculatePath';
 import { MAX_STEPS } from './KochSnowflake';
 
 enum Zoom {
@@ -69,11 +70,6 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             return;
         }
 
-        let x = (this.offset.x - this.center.x) * this.zoom + this.center.x;
-        let y = (this.offset.y - this.center.y) * this.zoom + this.center.y;
-        let length = 600 / 3 ** this.props.stepCount * this.zoom;
-        let angle = 0;
-
         let recursionIterationCountText;
         if (this.props.calculationType === 'recursive') {
             recursionIterationCountText = `${this.props.recursionCount} recursions`;
@@ -90,39 +86,46 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             `${this.props.joinCount} joins`,
         );
 
-        const anglePlus = this.props.anglePlus || 0;
-        const angleMinus = this.props.angleMinus || 0;
+        const canvasOffsetX = (this.offset.x - this.center.x) * this.zoom + this.center.x;
+        const canvasOffsetY = (this.offset.y - this.center.y) * this.zoom + this.center.y;
+
+        const transformX = (x: number): number => {
+            return x * this.zoom + canvasOffsetX;
+        };
+
+        const transformY = (y: number): number => {
+            return y * this.zoom + canvasOffsetY;
+        };
+
+        const x0 = 0;
+        const y0 = 0;
 
         this.drawTime = measureTime(() => {
 
-            canvas?.drawLineInit(x, y);
+            canvas?.drawLineInit(transformX(x0), transformY(y0));
 
-            for (let i = 0; i < this.props.resultRule.length; i++) {
-
-                const element = this.props.resultRule.charAt(i);
-
-                switch (element) {
-                    case '+':
-                        angle += anglePlus;
-                        break;
-                    case '-':
-                        angle += angleMinus;
-                        break;
-                    default:
-                        x += Math.cos(angle) * length;
-                        y -= Math.sin(angle) * length;
-                        canvas?.drawLine(x, y);
+            calculatePath({
+                x0,
+                y0,
+                stepCount: this.props.stepCount,
+                anglePlus: this.props.anglePlus,
+                angleMinus: this.props.angleMinus,
+                resultRule: this.props.resultRule,
+                drawCallback: (x: number, y: number) => {
+                    canvas?.drawLine(transformX(x), transformY(y));
                 }
-            }
+            });
 
             canvas?.drawLineFinish();
         });
 
         canvas?.drawTextLines(
             20,
-            720,
+            650,
             `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${this.drawTime} ms`,
+            `zoom: ${this.zoom}`,
+            `offet: (${this.offset.x}, ${this.offset.y})`,
         );
     }
 
