@@ -48,6 +48,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                     ruleB: 'B-A++B++A-B',
                     anglePlus: angleRadToDeg(Math.PI / 3.0),
                     angleMinus: angleRadToDeg(-2.0 * Math.PI / 3.0),
+                    offsetX: 200,
+                    offsetY: 600,
                 };
                 break;
 
@@ -61,6 +63,8 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                     ruleB: '',
                     anglePlus: angleRadToDeg(Math.PI / 3.0),
                     angleMinus: angleRadToDeg(-2.0 * Math.PI / 3.0),
+                    offsetX: 200,
+                    offsetY: 220,
                 };
                 break;
         }
@@ -139,6 +143,12 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                         <Field className='settings__input' name="angleMinus" component="input" type="text" />
                         <button onClick={this.increaseAngleMinus.bind(this)}>+</button>
                         <button onClick={this.decreaseAngleMinus.bind(this)}>-</button>
+
+                        <label htmlFor="offsetX">Offset X (not working yet !)</label>
+                        <Field className='settings__input' name="offsetX" component="input" type="text" />
+
+                        <label htmlFor="offsetY">Offset Y (not working yet !)</label>
+                        <Field className='settings__input' name="offsetY" component="input" type="text" />
 
                         <button type="submit">Berechnen & Zeichnen</button>
                     </div>

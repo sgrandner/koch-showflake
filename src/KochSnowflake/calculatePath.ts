@@ -5,17 +5,18 @@ export type CalculatePathProps = {
     anglePlus: number | undefined;
     angleMinus: number | undefined;
     resultRule: string;
+    growthFactor: number;
     drawCallback?: (x: number, y: number) => void;
 };
 
-const LENGTH_UNIT = 1000.0;
+const LENGTH_UNIT = 600.0;
 
 export const calculatePath = (props: CalculatePathProps) => {
 
     let x = props.x0;
     let y = props.y0;
 
-    let length = LENGTH_UNIT / 3 ** props.stepCount;
+    let length = LENGTH_UNIT / props.growthFactor ** props.stepCount;
     let angle = 0;
 
     const anglePlus = props.anglePlus || 0;

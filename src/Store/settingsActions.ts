@@ -10,4 +10,6 @@ export const setKochSnowflakeSettings = createAction('Set Koch Snowflake Setting
     ruleB: string,
     anglePlus: number,
     angleMinus: number,
+    offsetX: number,
+    offsetY: number,
 }>());

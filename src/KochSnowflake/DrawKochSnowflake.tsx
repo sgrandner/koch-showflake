@@ -17,8 +17,12 @@ type DrawKochSnowflakeProps = {
     stepCount: number;
     calculationType: 'recursive' | 'iterative';
     resultRule: string;
+    resultRule0: string;
+    resultRule1: string;
     anglePlus?: number;
     angleMinus?: number;
+    offsetX: number;
+    offsetY: number;
 
     recursionCount: number;
     iterationCount: number;
@@ -56,10 +60,17 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
     // FIXME maybe to often, trigger drawing on props change instead ?!
     componentDidUpdate() {
+
+        // FIXME initial offset for presets overwrites offset for every settings change !
+        // this.offset = {
+        //     x: this.props.offsetX,
+        //     y: this.props.offsetY,
+        // }
+
         this.draw();
     }
 
-    draw() {
+    draw(): void {
 
         const canvas = this.canvasContainerRef.current;
 
@@ -104,6 +115,8 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
             canvas?.drawLineInit(transformX(x0), transformY(y0));
 
+            const growthFactor = this.calculateGrowthFactor();
+
             calculatePath({
                 x0,
                 y0,
@@ -111,6 +124,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 anglePlus: this.props.anglePlus,
                 angleMinus: this.props.angleMinus,
                 resultRule: this.props.resultRule,
+                growthFactor,
                 drawCallback: (x: number, y: number) => {
                     canvas?.drawLine(transformX(x), transformY(y));
                 }
@@ -129,7 +143,47 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         );
     }
 
-    handleMouseDrag(drag: { x: number, y: number }) {
+    calculateGrowthFactor(): number {
+
+        let length0 = 0;
+        let length1 = 0;
+
+        // NOTE length of path for step 0
+        calculatePath({
+            x0: 0,
+            y0: 0,
+            stepCount: 0,
+            anglePlus: this.props.anglePlus,
+            angleMinus: this.props.angleMinus,
+            resultRule: this.props.resultRule0,
+            growthFactor: 1,
+            drawCallback: (x: number, y: number) => {
+                length0 = Math.sqrt(x ** 2 + y ** 2);
+            }
+        });
+
+        // NOTE length of path for step 1
+        calculatePath({
+            x0: 0,
+            y0: 0,
+            stepCount: 1,
+            anglePlus: this.props.anglePlus,
+            angleMinus: this.props.angleMinus,
+            resultRule: this.props.resultRule1,
+            growthFactor: 1,
+            drawCallback: (x: number, y: number) => {
+                length1 = Math.sqrt(x ** 2 + y ** 2);
+            }
+        });
+
+        if (length0 === 0 || length1 === 0) {
+            return 1;
+        }
+
+        return length1 / length0;
+    }
+
+    handleMouseDrag(drag: { x: number, y: number }): void {
 
         const newOffset = {
             x: this.offset.x + drag.x / this.zoom,
@@ -143,19 +197,19 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         }
     }
 
-    handleOnMouseDragFinish() {
+    handleOnMouseDragFinish(): void {
         this.draw();
     }
 
-    zoomIn() {
+    zoomIn(): void {
         this.handleZoom(Zoom.IN);
     }
 
-    zoomOut() {
+    zoomOut(): void {
         this.handleZoom(Zoom.OUT);
     }
 
-    handleZoom(zoom: Zoom) {
+    handleZoom(zoom: Zoom): void {
 
         switch (zoom) {
             case Zoom.IN:
@@ -192,6 +246,8 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 const mapStateToProps = (state: RootState) => ({
     anglePlus: state.settings.anglePlus,
     angleMinus: state.settings.angleMinus,
+    offsetX: state.settings.offsetX,
+    offsetY: state.settings.offsetY,
 });
 
 export default connect(mapStateToProps)(DrawKochSnowflake);

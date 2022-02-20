@@ -9,6 +9,8 @@ export type SettingsState = {
     ruleB: string;
     anglePlus: number;
     angleMinus: number;
+    offsetX: number;
+    offsetY: number;
 };
 
 const initialState: SettingsState = {
@@ -18,6 +20,8 @@ const initialState: SettingsState = {
     ruleB: '',
     anglePlus: 0,
     angleMinus: 0,
+    offsetX: 0,
+    offsetY: 0,
 };
 
 const settingsReducer = (state = initialState, action: AnyAction): SettingsState => {
@@ -33,6 +37,8 @@ const settingsReducer = (state = initialState, action: AnyAction): SettingsState
                 ruleB: action.payload.ruleB,
                 anglePlus: action.payload.anglePlus,
                 angleMinus: action.payload.angleMinus,
+                offsetX: action.payload.offsetX,
+                offsetY: action.payload.offsetY,
             };
         default:
             return state;
