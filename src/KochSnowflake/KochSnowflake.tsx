@@ -1,3 +1,5 @@
+import './KochSnowflake.css';
+
 import React from 'react';
 import {
     connect,
@@ -160,10 +162,10 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
         this.calculate();
 
         return (
-            <div>
+            <div className='koch-snowflake'>
                 <KochSnowflakeSettings onSubmit={this.submit.bind(this)}/>
                 <DrawKochSnowflake
-                    canvasProps={{ width: '1000', height: '800' }}
+                    canvasProps={{ width: '1800', height: '1600' }}
                     stepCount={this.props.stepCount}
                     calculationType={this.calculationType}
                     resultRule={this.resultRule}

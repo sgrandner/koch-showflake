@@ -37,7 +37,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
     canvasContainerRef: RefObject<CanvasContainer>;
 
-    offset = { x: 200, y: 220 };
+    offset = { x: 600, y: 600 };
     zoom = 1;
     drawTime = 0;
     updateCount = 0;
@@ -135,11 +135,11 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
         canvas?.drawTextLines(
             20,
-            650,
+            1450,
             `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${this.drawTime} ms`,
             `zoom: ${this.zoom}`,
-            `offet: (${this.offset.x}, ${this.offset.y})`,
+            `offset: (${this.offset.x}, ${this.offset.y})`,
         );
     }
 
