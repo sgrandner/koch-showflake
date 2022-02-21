@@ -76,7 +76,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
         canvas?.clearCanvas();
 
-        if (this.props.stepCount > MAX_STEPS) {
+        if (!(this.props.stepCount >= 0 && this.props.stepCount <= MAX_STEPS)) {
             canvas?.drawText(30, 50, `too many recursion steps (max. ${MAX_STEPS}) !`);
             return;
         }

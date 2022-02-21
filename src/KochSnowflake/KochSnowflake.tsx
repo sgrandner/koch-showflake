@@ -20,7 +20,7 @@ type KochSnowflakeProps = {
     ruleB: string;
 };
 
-export const MAX_STEPS = 13;
+export const MAX_STEPS = 16;
 
 class KochSnowflake extends React.Component<KochSnowflakeProps> {
 
@@ -44,7 +44,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
         this.joinCount = 0;
         this.calculationTime = 0;
 
-        if (!(this.props.stepCount >= 0 && this.props.stepCount < MAX_STEPS)) {
+        if (!(this.props.stepCount >= 0 && this.props.stepCount <= MAX_STEPS)) {
             return;
         }
 
