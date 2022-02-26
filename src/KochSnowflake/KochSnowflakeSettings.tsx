@@ -67,6 +67,20 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                 };
                 break;
 
+            case 'gosper':
+                initalValues = {
+                    preset: 'gosper',
+                    stepCount: 4,
+                    startWord: 'A',
+                    ruleA: 'A-B--B+A++AA+B-',
+                    ruleB: '+A-BB--B-A++A+B',
+                    anglePlus: angleRadToDeg(Math.PI / 3.0),
+                    angleMinus: angleRadToDeg(-Math.PI / 3.0),
+                    offsetX: 200,
+                    offsetY: 600,
+                };
+                break;
+
             case 'koch':
             default:
                 initalValues = {
@@ -133,6 +147,7 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                             <option value="koch">Kochsche Schneeflocke</option>
                             <option value="sierpinski">Sierpinski Dreieck</option>
                             <option value="dragon">Drachen-Kurve</option>
+                            <option value="gosper">Gosper-Kurve</option>
                         </Field>
 
                         <label htmlFor="stepCount">Schritte</label>
