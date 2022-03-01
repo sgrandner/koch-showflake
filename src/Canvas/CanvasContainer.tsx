@@ -2,10 +2,16 @@ import './CanvasContainer.css';
 
 import React, { RefObject } from 'react';
 
+enum Zoom {
+    IN,
+    OUT,
+}
+
 type CanvasContainerProps = {
     canvasProps: { width: string, height: string };
-    onMouseDrag?: (drag: { x: number, y: number }) => void | undefined;
+    onMouseDrag?: (canvasOffset: { x: number, y: number }) => void | undefined;
     onMouseDragFinish?: () => void | undefined;
+    onZoom?: (zoom: number) => void | undefined;
 };
 
 class CanvasContainer extends React.Component<CanvasContainerProps> {
@@ -13,12 +19,19 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     canvasRef: RefObject<HTMLCanvasElement>;
     ctx: CanvasRenderingContext2D | undefined | null;
 
+    offset = { x: 600, y: 600 };
+    center = { x: 0, y: 0 };
     dragActive = false;
+    zoom = 1;
+    ZOOM_STEP = 1.5;
 
     constructor(props: CanvasContainerProps) {
 
         super(props);
         this.canvasRef = React.createRef();
+        
+        this.center.x = Number(this.props.canvasProps.width) / 2;
+        this.center.y = Number(this.props.canvasProps.height) / 2;
     }
 
     componentDidMount() {
@@ -118,20 +131,61 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.props.onMouseDrag({
-            x: $event?.movementX,
-            y: $event?.movementY,
-        });
+        this.offset = {
+            x: this.offset.x + $event?.movementX / this.zoom,
+            y: this.offset.y + $event?.movementY / this.zoom,
+        };
+
+        const canvasOffset = {
+            x: (this.offset.x - this.center.x) * this.zoom + this.center.x,
+            y: (this.offset.y - this.center.y) * this.zoom + this.center.y,
+        };
+
+        this.props.onMouseDrag(canvasOffset);
+    }
+
+    zoomIn(): void {
+        this.handleZoom(Zoom.IN);
+    }
+
+    zoomOut(): void {
+        this.handleZoom(Zoom.OUT);
+    }
+
+    handleZoom(zoom: Zoom): void {
+
+        if (!this.props?.onZoom) {
+            return;
+        }
+
+        switch (zoom) {
+            case Zoom.IN:
+                this.zoom *= this.ZOOM_STEP;
+                break;
+            case Zoom.OUT:
+                this.zoom /= this.ZOOM_STEP;
+                break;
+            default:
+                break;
+        }
+
+        this.props.onZoom(this.zoom || 1.0);
     }
 
     render() {
-        return <canvas
-            ref={this.canvasRef}
-            {...this.props.canvasProps}
-            onMouseDown={this.mouseDown.bind(this)}
-            onMouseUp={this.mouseUp.bind(this)}
-            onMouseMove={this.mouseMove.bind(this)}
-        />;
+        return (
+            <>
+                <canvas
+                    ref={this.canvasRef}
+                    {...this.props.canvasProps}
+                    onMouseDown={this.mouseDown.bind(this)}
+                    onMouseUp={this.mouseUp.bind(this)}
+                    onMouseMove={this.mouseMove.bind(this)}
+                />
+                <button onClick={this.zoomIn.bind(this)}>Zoom In</button>
+                <button onClick={this.zoomOut.bind(this)}>Zoom Out</button>
+            </>
+        );
     }
 }
 
