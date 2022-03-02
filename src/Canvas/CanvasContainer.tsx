@@ -2,10 +2,16 @@ import './CanvasContainer.css';
 
 import React, { RefObject } from 'react';
 
+enum Zoom {
+    IN,
+    OUT,
+}
+
 type CanvasContainerProps = {
     canvasProps: { width: string, height: string };
-    onMouseDrag?: (drag: { x: number, y: number }) => void | undefined;
+    onMouseDrag?: () => void | undefined;
     onMouseDragFinish?: () => void | undefined;
+    onZoom?: () => void | undefined;
 };
 
 class CanvasContainer extends React.Component<CanvasContainerProps> {
@@ -13,12 +19,22 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     canvasRef: RefObject<HTMLCanvasElement>;
     ctx: CanvasRenderingContext2D | undefined | null;
 
+    offset = { x: 600, y: 600 };
+    offsetCentered = { x: 0, y: 0 };
+    center = { x: 0, y: 0 };
     dragActive = false;
+    zoom = 1;
+    ZOOM_STEP = 1.5;
 
     constructor(props: CanvasContainerProps) {
 
         super(props);
         this.canvasRef = React.createRef();
+        
+        this.center.x = Number(this.props.canvasProps.width) / 2;
+        this.center.y = Number(this.props.canvasProps.height) / 2;
+
+        this.determineOffset();
     }
 
     componentDidMount() {
@@ -76,6 +92,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.moveTo(x, y);
     }
 
+    drawLineTransformedInit(x: number, y: number) {
+
+        this.drawLineInit(this.transformX(x), this.transformY(y));
+    }
+
     drawLine(x: number, y: number) {
 
         if (!this.ctx) {
@@ -83,6 +104,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         }
 
         this.ctx.lineTo(x, y);
+    }
+
+    drawLineTransformed(x: number, y: number) {
+
+        this.drawLine(this.transformX(x), this.transformY(y));
     }
 
     drawLineFinish() {
@@ -93,6 +119,27 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         this.ctx.stroke();
     }
+
+    determineOffset(movementX = 0, movementY = 0): void {
+
+        this.offset = {
+            x: this.offset.x + movementX / this.zoom,
+            y: this.offset.y + movementY / this.zoom,
+        };
+
+        this.offsetCentered = {
+            x: (this.offset.x - this.center.x) * this.zoom + this.center.x,
+            y: (this.offset.y - this.center.y) * this.zoom + this.center.y,
+        };
+    }
+
+    transformX(x: number): number {
+        return x * this.zoom + this.offsetCentered.x;
+    };
+
+    transformY(y: number): number {
+        return y * this.zoom + this.offsetCentered.y;
+    };
 
     mouseDown() {
         this.dragActive = true;
@@ -118,20 +165,55 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.props.onMouseDrag({
-            x: $event?.movementX,
-            y: $event?.movementY,
-        });
+        this.determineOffset($event.movementX, $event.movementY);
+
+        this.props.onMouseDrag();
+    }
+
+    zoomIn(): void {
+        this.handleZoom(Zoom.IN);
+    }
+
+    zoomOut(): void {
+        this.handleZoom(Zoom.OUT);
+    }
+
+    handleZoom(zoom: Zoom): void {
+
+        if (!this.props?.onZoom) {
+            return;
+        }
+
+        switch (zoom) {
+            case Zoom.IN:
+                this.zoom *= this.ZOOM_STEP;
+                break;
+            case Zoom.OUT:
+                this.zoom /= this.ZOOM_STEP;
+                break;
+            default:
+                break;
+        }
+
+        this.determineOffset();
+
+        this.props.onZoom();
     }
 
     render() {
-        return <canvas
-            ref={this.canvasRef}
-            {...this.props.canvasProps}
-            onMouseDown={this.mouseDown.bind(this)}
-            onMouseUp={this.mouseUp.bind(this)}
-            onMouseMove={this.mouseMove.bind(this)}
-        />;
+        return (
+            <>
+                <canvas
+                    ref={this.canvasRef}
+                    {...this.props.canvasProps}
+                    onMouseDown={this.mouseDown.bind(this)}
+                    onMouseUp={this.mouseUp.bind(this)}
+                    onMouseMove={this.mouseMove.bind(this)}
+                />
+                <button onClick={this.zoomIn.bind(this)}>Zoom In</button>
+                <button onClick={this.zoomOut.bind(this)}>Zoom Out</button>
+            </>
+        );
     }
 }
 

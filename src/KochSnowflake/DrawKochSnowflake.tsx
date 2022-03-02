@@ -7,11 +7,6 @@ import measureTime from '../Utils/measureTime';
 import { calculatePath } from './calculatePath';
 import { MAX_STEPS } from './KochSnowflake';
 
-enum Zoom {
-    IN,
-    OUT,
-}
-
 type DrawKochSnowflakeProps = {
     canvasProps: { width: string, height: string };
     stepCount: number;
@@ -37,21 +32,13 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
     canvasContainerRef: RefObject<CanvasContainer>;
 
-    offset = { x: 600, y: 600 };
-    zoom = 1;
     drawTime = 0;
     updateCount = 0;
-
-    center = { x: 0, y: 0 };
-    ZOOM_STEP = 1.5;
 
     constructor(props: DrawKochSnowflakeProps) {
 
         super(props);
         this.canvasContainerRef = React.createRef();
-
-        this.center.x = Number(this.props.canvasProps.width) / 2;
-        this.center.y = Number(this.props.canvasProps.height) / 2;
     }
 
     componentDidMount() {
@@ -97,23 +84,12 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             `${this.props.joinCount} joins`,
         );
 
-        const canvasOffsetX = (this.offset.x - this.center.x) * this.zoom + this.center.x;
-        const canvasOffsetY = (this.offset.y - this.center.y) * this.zoom + this.center.y;
-
-        const transformX = (x: number): number => {
-            return x * this.zoom + canvasOffsetX;
-        };
-
-        const transformY = (y: number): number => {
-            return y * this.zoom + canvasOffsetY;
-        };
-
         const x0 = 0;
         const y0 = 0;
 
         this.drawTime = measureTime(() => {
 
-            canvas?.drawLineInit(transformX(x0), transformY(y0));
+            canvas?.drawLineTransformedInit(x0, y0);
 
             const growthFactor = this.calculateGrowthFactor();
 
@@ -126,7 +102,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 resultRule: this.props.resultRule,
                 growthFactor,
                 drawCallback: (x: number, y: number) => {
-                    canvas?.drawLine(transformX(x), transformY(y));
+                    canvas?.drawLineTransformed(x, y);
                 }
             });
 
@@ -138,8 +114,6 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             1450,
             `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${this.drawTime} ms`,
-            `zoom: ${this.zoom}`,
-            `offset: (${this.offset.x}, ${this.offset.y})`,
         );
     }
 
@@ -183,45 +157,18 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         return length1 / length0;
     }
 
-    handleMouseDrag(drag: { x: number, y: number }): void {
-
-        const newOffset = {
-            x: this.offset.x + drag.x / this.zoom,
-            y: this.offset.y + drag.y / this.zoom,
-        };
-
-        this.offset = newOffset;
+    handleMouseDrag(): void {
 
         if (this.props.calculationTime + this.drawTime <= 10) {
             this.draw();
         }
     }
 
-    handleOnMouseDragFinish(): void {
+    handleMouseDragFinish(): void {
         this.draw();
     }
 
-    zoomIn(): void {
-        this.handleZoom(Zoom.IN);
-    }
-
-    zoomOut(): void {
-        this.handleZoom(Zoom.OUT);
-    }
-
-    handleZoom(zoom: Zoom): void {
-
-        switch (zoom) {
-            case Zoom.IN:
-                this.zoom *= this.ZOOM_STEP;
-                break;
-            case Zoom.OUT:
-                this.zoom /= this.ZOOM_STEP;
-                break;
-            default:
-                break;
-        }
-
+    handleZoom(): void {
         this.draw();
     }
 
@@ -232,10 +179,9 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                     ref={this.canvasContainerRef}
                     canvasProps={this.props.canvasProps}
                     onMouseDrag={this.handleMouseDrag.bind(this)}
-                    onMouseDragFinish={this.handleOnMouseDragFinish.bind(this)}
+                    onMouseDragFinish={this.handleMouseDragFinish.bind(this)}
+                    onZoom={this.handleZoom.bind(this)}
                 />
-                <button onClick={this.zoomIn.bind(this)}>Zoom In</button>
-                <button onClick={this.zoomOut.bind(this)}>Zoom Out</button>
 
                 <div>update count: {++this.updateCount}</div>
             </div>
