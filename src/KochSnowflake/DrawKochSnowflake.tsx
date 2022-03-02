@@ -32,8 +32,6 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
     canvasContainerRef: RefObject<CanvasContainer>;
 
-    canvasOffset = { x: 600, y: 600 };
-    zoom = 1;
     drawTime = 0;
     updateCount = 0;
 
@@ -86,20 +84,12 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             `${this.props.joinCount} joins`,
         );
 
-        const transformX = (x: number): number => {
-            return x * this.zoom + this.canvasOffset.x;
-        };
-
-        const transformY = (y: number): number => {
-            return y * this.zoom + this.canvasOffset.y;
-        };
-
         const x0 = 0;
         const y0 = 0;
 
         this.drawTime = measureTime(() => {
 
-            canvas?.drawLineInit(transformX(x0), transformY(y0));
+            canvas?.drawLineTransformedInit(x0, y0);
 
             const growthFactor = this.calculateGrowthFactor();
 
@@ -112,7 +102,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 resultRule: this.props.resultRule,
                 growthFactor,
                 drawCallback: (x: number, y: number) => {
-                    canvas?.drawLine(transformX(x), transformY(y));
+                    canvas?.drawLineTransformed(x, y);
                 }
             });
 
@@ -124,8 +114,6 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
             1450,
             `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${this.drawTime} ms`,
-            `zoom: ${this.zoom}`,
-            `canvasOffset: (${this.canvasOffset.x}, ${this.canvasOffset.y})`,
         );
     }
 
@@ -169,22 +157,18 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         return length1 / length0;
     }
 
-    handleMouseDrag(canvasOffset: { x: number, y: number }): void {
-
-        this.canvasOffset = canvasOffset;
+    handleMouseDrag(): void {
 
         if (this.props.calculationTime + this.drawTime <= 10) {
             this.draw();
         }
     }
 
-    handleOnMouseDragFinish(): void {
+    handleMouseDragFinish(): void {
         this.draw();
     }
 
-    handleZoom(zoom: number): void {
-        
-        this.zoom = zoom;
+    handleZoom(): void {
         this.draw();
     }
 
@@ -195,7 +179,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                     ref={this.canvasContainerRef}
                     canvasProps={this.props.canvasProps}
                     onMouseDrag={this.handleMouseDrag.bind(this)}
-                    onMouseDragFinish={this.handleOnMouseDragFinish.bind(this)}
+                    onMouseDragFinish={this.handleMouseDragFinish.bind(this)}
                     onZoom={this.handleZoom.bind(this)}
                 />
 

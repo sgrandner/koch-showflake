@@ -9,9 +9,9 @@ enum Zoom {
 
 type CanvasContainerProps = {
     canvasProps: { width: string, height: string };
-    onMouseDrag?: (canvasOffset: { x: number, y: number }) => void | undefined;
+    onMouseDrag?: () => void | undefined;
     onMouseDragFinish?: () => void | undefined;
-    onZoom?: (zoom: number) => void | undefined;
+    onZoom?: () => void | undefined;
 };
 
 class CanvasContainer extends React.Component<CanvasContainerProps> {
@@ -20,6 +20,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     ctx: CanvasRenderingContext2D | undefined | null;
 
     offset = { x: 600, y: 600 };
+    offsetCentered = { x: 0, y: 0 };
     center = { x: 0, y: 0 };
     dragActive = false;
     zoom = 1;
@@ -32,6 +33,8 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         
         this.center.x = Number(this.props.canvasProps.width) / 2;
         this.center.y = Number(this.props.canvasProps.height) / 2;
+
+        this.determineOffset();
     }
 
     componentDidMount() {
@@ -89,6 +92,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.moveTo(x, y);
     }
 
+    drawLineTransformedInit(x: number, y: number) {
+
+        this.drawLineInit(this.transformX(x), this.transformY(y));
+    }
+
     drawLine(x: number, y: number) {
 
         if (!this.ctx) {
@@ -96,6 +104,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         }
 
         this.ctx.lineTo(x, y);
+    }
+
+    drawLineTransformed(x: number, y: number) {
+
+        this.drawLine(this.transformX(x), this.transformY(y));
     }
 
     drawLineFinish() {
@@ -106,6 +119,27 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         this.ctx.stroke();
     }
+
+    determineOffset(movementX = 0, movementY = 0): void {
+
+        this.offset = {
+            x: this.offset.x + movementX / this.zoom,
+            y: this.offset.y + movementY / this.zoom,
+        };
+
+        this.offsetCentered = {
+            x: (this.offset.x - this.center.x) * this.zoom + this.center.x,
+            y: (this.offset.y - this.center.y) * this.zoom + this.center.y,
+        };
+    }
+
+    transformX(x: number): number {
+        return x * this.zoom + this.offsetCentered.x;
+    };
+
+    transformY(y: number): number {
+        return y * this.zoom + this.offsetCentered.y;
+    };
 
     mouseDown() {
         this.dragActive = true;
@@ -131,17 +165,9 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.offset = {
-            x: this.offset.x + $event?.movementX / this.zoom,
-            y: this.offset.y + $event?.movementY / this.zoom,
-        };
+        this.determineOffset($event.movementX, $event.movementY);
 
-        const canvasOffset = {
-            x: (this.offset.x - this.center.x) * this.zoom + this.center.x,
-            y: (this.offset.y - this.center.y) * this.zoom + this.center.y,
-        };
-
-        this.props.onMouseDrag(canvasOffset);
+        this.props.onMouseDrag();
     }
 
     zoomIn(): void {
@@ -169,7 +195,9 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
                 break;
         }
 
-        this.props.onZoom(this.zoom || 1.0);
+        this.determineOffset();
+
+        this.props.onZoom();
     }
 
     render() {
