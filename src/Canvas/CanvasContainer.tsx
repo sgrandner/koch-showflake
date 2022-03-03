@@ -18,12 +18,13 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
     canvasRef: RefObject<HTMLCanvasElement>;
     ctx: CanvasRenderingContext2D | undefined | null;
+    canvasData: ImageData | undefined;
 
-    offset = { x: 600, y: 600 };
+    offset = { x: 201, y: 200 };
     offsetCentered = { x: 0, y: 0 };
     center = { x: 0, y: 0 };
     dragActive = false;
-    zoom = 1;
+    zoom = 100;
     ZOOM_STEP = 1.5;
 
     constructor(props: CanvasContainerProps) {
@@ -37,16 +38,17 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.determineOffset();
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
 
         const canvas = this.canvasRef.current;
 
         if (!!canvas) {
             this.ctx = canvas.getContext('2d');
+            this.canvasData = this.ctx?.getImageData(0, 0, Number(this.props.canvasProps.width), Number(this.props.canvasProps.height));
         }
     }
 
-    clearCanvas() {
+    clearCanvas(): void {
 
         if (!this.ctx) {
             return;
@@ -56,7 +58,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    drawText(x: number, y: number, text: string | undefined) {
+    drawText(x: number, y: number, text: string | undefined): void {
 
         if (!this.ctx || !text) {
             return;
@@ -67,7 +69,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.fillText(text, x, y);
     }
 
-    drawTextLines(x: number, y: number, ...textLines: string[]) {
+    drawTextLines(x: number, y: number, ...textLines: string[]): void {
 
         if (!this.ctx) {
             return;
@@ -81,7 +83,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         });
     }
 
-    drawLineInit(x: number, y: number) {
+    drawLineInit(x: number, y: number): void {
 
         if (!this.ctx) {
             return;
@@ -92,12 +94,12 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.moveTo(x, y);
     }
 
-    drawLineTransformedInit(x: number, y: number) {
+    drawLineTransformedInit(x: number, y: number): void {
 
         this.drawLineInit(this.transformX(x), this.transformY(y));
     }
 
-    drawLine(x: number, y: number) {
+    drawLine(x: number, y: number): void {
 
         if (!this.ctx) {
             return;
@@ -106,18 +108,42 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.lineTo(x, y);
     }
 
-    drawLineTransformed(x: number, y: number) {
+    drawLineTransformed(x: number, y: number): void {
 
         this.drawLine(this.transformX(x), this.transformY(y));
     }
 
-    drawLineFinish() {
+    drawLineFinish(): void {
 
         if (!this.ctx) {
             return;
         }
 
         this.ctx.stroke();
+    }
+
+    // see https://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
+    drawPixel(x: number, y: number, r: number, g: number, b: number): void {
+
+        if (!this.canvasData) {
+            return;
+        }
+
+        const index = (x + y * Number(this.props.canvasProps.width)) * 4;
+
+        this.canvasData.data[index] = r;
+        this.canvasData.data[index + 1] = g;
+        this.canvasData.data[index + 2] = b;
+        this.canvasData.data[index + 3] = 255;
+    }
+
+    drawPixelsFinish(): void {
+        
+        if (!this.canvasData) {
+            return;
+        }
+
+        this.ctx?.putImageData(this.canvasData, 0, 0);
     }
 
     determineOffset(movementX = 0, movementY = 0): void {
@@ -133,6 +159,14 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         };
     }
 
+    getCoordByCanvasCoord(canvasX: number, canvasY: number): { x: number, y: number } {
+
+        return {
+            x: (canvasX - this.offsetCentered.x) / this.zoom,
+            y: (canvasY - this.offsetCentered.y) / this.zoom,
+        };
+    }
+
     transformX(x: number): number {
         return x * this.zoom + this.offsetCentered.x;
     };
@@ -141,11 +175,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         return y * this.zoom + this.offsetCentered.y;
     };
 
-    mouseDown() {
+    mouseDown(): void {
         this.dragActive = true;
     }
 
-    mouseUp() {
+    mouseUp(): void {
         this.dragActive = false;
 
         if (!this.props?.onMouseDragFinish) {
@@ -155,7 +189,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.props.onMouseDragFinish();
     }
 
-    mouseMove($event: React.MouseEvent) {
+    mouseMove($event: React.MouseEvent): void {
 
         if (!this.dragActive) {
             return;

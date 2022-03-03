@@ -2,15 +2,16 @@ import './App.css';
 
 import React from 'react';
 
-import KochSnowflake from './KochSnowflake/KochSnowflake';
+import ComplexSequence from './ComplexSequence/ComplexSequence';
 
 function App() {
     return (
         <div className='app'>
-            <header>
+            {/* <header>
                 Kochsche Schneeflocke
-            </header>
-            <KochSnowflake />
+            </header> */}
+            {/* <KochSnowflake /> */}
+            <ComplexSequence />
         </div>
     );
 }
