@@ -20,11 +20,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     ctx: CanvasRenderingContext2D | undefined | null;
     canvasData: ImageData | undefined;
 
-    offset = { x: 201, y: 200 };
-    offsetCentered = { x: 0, y: 0 };
-    center = { x: 0, y: 0 };
+    mouseOffset = { x: 0, y: 0 };
+    coordOriginOnCanvas = { x: 0, y: 0 };
+    center: { x: number, y: number };
     dragActive = false;
-    zoom = 100;
+    zoom = 200;
     ZOOM_STEP = 1.5;
 
     constructor(props: CanvasContainerProps) {
@@ -32,10 +32,12 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         super(props);
         this.canvasRef = React.createRef();
         
-        this.center.x = Number(this.props.canvasProps.width) / 2;
-        this.center.y = Number(this.props.canvasProps.height) / 2;
+        this.center = {
+            x: Number(this.props.canvasProps.width) * 0.5,
+            y: Number(this.props.canvasProps.height) * 0.5,
+        };
 
-        this.determineOffset();
+        this.determineOffset(150, 0);
     }
 
     componentDidMount(): void {
@@ -75,7 +77,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.ctx.font = '32px serif';
+        this.ctx.font = '15px serif';
         this.ctx.fillStyle = '#ffffff';
 
         textLines.forEach((text, index) => {
@@ -131,10 +133,10 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         const index = (x + y * Number(this.props.canvasProps.width)) * 4;
 
-        this.canvasData.data[index] = r;
-        this.canvasData.data[index + 1] = g;
-        this.canvasData.data[index + 2] = b;
-        this.canvasData.data[index + 3] = 255;
+        this.canvasData.data[ index ] = r;
+        this.canvasData.data[ index + 1 ] = g;
+        this.canvasData.data[ index + 2 ] = b;
+        this.canvasData.data[ index + 3 ] = 255;
     }
 
     drawPixelsFinish(): void {
@@ -148,31 +150,31 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
     determineOffset(movementX = 0, movementY = 0): void {
 
-        this.offset = {
-            x: this.offset.x + movementX / this.zoom,
-            y: this.offset.y + movementY / this.zoom,
+        this.mouseOffset = {
+            x: this.mouseOffset.x + movementX / this.zoom,
+            y: this.mouseOffset.y + movementY / this.zoom,
         };
 
-        this.offsetCentered = {
-            x: (this.offset.x - this.center.x) * this.zoom + this.center.x,
-            y: (this.offset.y - this.center.y) * this.zoom + this.center.y,
+        this.coordOriginOnCanvas = {
+            x: this.mouseOffset.x * this.zoom + this.center.x,
+            y: this.mouseOffset.y * this.zoom + this.center.y,
         };
     }
 
     getCoordByCanvasCoord(canvasX: number, canvasY: number): { x: number, y: number } {
 
         return {
-            x: (canvasX - this.offsetCentered.x) / this.zoom,
-            y: (canvasY - this.offsetCentered.y) / this.zoom,
+            x: (canvasX - this.coordOriginOnCanvas.x) / this.zoom,
+            y: (canvasY - this.coordOriginOnCanvas.y) / this.zoom,
         };
     }
 
     transformX(x: number): number {
-        return x * this.zoom + this.offsetCentered.x;
+        return x * this.zoom + this.coordOriginOnCanvas.x;
     };
 
     transformY(y: number): number {
-        return y * this.zoom + this.offsetCentered.y;
+        return y * this.zoom + this.coordOriginOnCanvas.y;
     };
 
     mouseDown(): void {

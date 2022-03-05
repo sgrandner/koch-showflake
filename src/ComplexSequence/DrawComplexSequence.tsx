@@ -1,6 +1,7 @@
 import React, { RefObject } from 'react';
 
 import CanvasContainer from '../Canvas/CanvasContainer';
+import measureTime from '../Utils/measureTime';
 
 type Color = {
     r: number;
@@ -15,7 +16,6 @@ type Complex = {
 
 type DrawComplexSequenceProps = {
     canvasProps: { width: string, height: string };
-    calculationTime: number;
 };
 
 class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
@@ -25,7 +25,7 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
 
     canvasContainerRef: RefObject<CanvasContainer>;
 
-    drawTime = 0;
+    calculationDrawTime = 0;
     updateCount = 0;
 
     constructor(props: DrawComplexSequenceProps) {
@@ -56,7 +56,6 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
 
         for (let index = 0; index < iterationMax; index++) {
 
-            
             const zReTemp = zRe ** 2 - zIm ** 2 + cRe;
             const zImTemp = 2 * zRe * zIm + cIm;
 
@@ -83,40 +82,43 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
 
         canvas?.clearCanvas();
 
-        const deltaX = 1;
-        const deltaY = 1;
+        this.calculationDrawTime = measureTime(() => {
 
-        for (let y = 0; y < Number(this.props.canvasProps.height); y += deltaX) {
-            for (let x = 0; x < Number(this.props.canvasProps.width); x += deltaY) {
-
-                const point = canvas?.getCoordByCanvasCoord(x, y);
-
-                if (!!point) {
-                    const color = this.calculateMandelbrot(point.x, point.y);
-                    canvas?.drawPixel(x, y, color.r, color.g, color.b);
+            const deltaX = 1;
+            const deltaY = 1;
+    
+            for (let y = 0; y < Number(this.props.canvasProps.height); y += deltaX) {
+                for (let x = 0; x < Number(this.props.canvasProps.width); x += deltaY) {
+    
+                    const point = canvas?.getCoordByCanvasCoord(x, y);
+    
+                    if (!!point) {
+                        const color = this.calculateMandelbrot(point.x, point.y);
+                        canvas?.drawPixel(x, y, color.r, color.g, color.b);
+                    }
                 }
             }
-        }
-        canvas?.drawPixelsFinish();
+            canvas?.drawPixelsFinish();
+    
+            canvas?.drawLineTransformedInit(-1000, 0);
+            canvas?.drawLineTransformed(1000, 0);
+            canvas?.drawLineFinish();
+            canvas?.drawLineTransformedInit(0, -1000);
+            canvas?.drawLineTransformed(0, 1000);
+            canvas?.drawLineFinish();
 
-        canvas?.drawLineTransformedInit(-1000, 0);
-        canvas?.drawLineTransformed(1000, 0);
-        canvas?.drawLineFinish();
-        canvas?.drawLineTransformedInit(0, -1000);
-        canvas?.drawLineTransformed(0, 1000);
-        canvas?.drawLineFinish();
+            canvas?.drawTextLines(
+                20,
+                20,
+                `calculation and draw time: ${this.calculationDrawTime} ms`,
+            );
+        });
 
-        canvas?.drawTextLines(
-            20,
-            1500,
-            `calculation time: ${this.props.calculationTime} ms`,
-            `draw time: ${this.drawTime} ms`,
-        );
     }
 
     handleMouseDrag(): void {
 
-        if (this.props.calculationTime + this.drawTime <= 10) {
+        if (this.calculationDrawTime <= 100) {
             this.draw();
         }
     }

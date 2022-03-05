@@ -11,21 +11,12 @@ export const MAX_STEPS = 16;
 
 class ComplexSequence extends React.Component<ComplexSequenceProps> {
 
-    calculationTime = 0;
-
-    calculate() {
-
-    }
-
     render() {
-
-        this.calculate();
 
         return (
             <div className='koch-snowflake'>
                 <DrawComplexSequence
-                    canvasProps={{ width: '400', height: '400' }}
-                    calculationTime={this.calculationTime}
+                    canvasProps={{ width: '600', height: '600' }}
                 />
             </div>
         );
