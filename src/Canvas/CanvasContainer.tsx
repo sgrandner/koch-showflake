@@ -2,6 +2,9 @@ import './CanvasContainer.css';
 
 import React, { RefObject } from 'react';
 
+import { CanvasPoint } from '../_domain/CanvasPoint';
+import { Point } from '../_domain/Point';
+
 enum Zoom {
     IN,
     OUT,
@@ -20,9 +23,9 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     ctx: CanvasRenderingContext2D | undefined | null;
     canvasData: ImageData | undefined;
 
-    mouseOffset = { x: 0, y: 0 };
-    coordOriginOnCanvas = { x: 0, y: 0 };
-    center: { x: number, y: number };
+    coordOffset: Point;
+    coordOriginOnCanvas: CanvasPoint;
+    center: CanvasPoint;
     dragActive = false;
     zoom = 200;
     ZOOM_STEP = 1.5;
@@ -32,9 +35,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         super(props);
         this.canvasRef = React.createRef();
         
+        this.coordOffset = { x: 0, y: 0 };
+        this.coordOriginOnCanvas = { cx: 0, cy: 0 };
         this.center = {
-            x: Number(this.props.canvasProps.width) * 0.5,
-            y: Number(this.props.canvasProps.height) * 0.5,
+            cx: Number(this.props.canvasProps.width) * 0.5,
+            cy: Number(this.props.canvasProps.height) * 0.5,
         };
 
         this.determineOffset(150, 0);
@@ -60,7 +65,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    drawText(x: number, y: number, text: string | undefined): void {
+    drawText(cp: CanvasPoint, text: string | undefined): void {
 
         if (!this.ctx || !text) {
             return;
@@ -68,10 +73,10 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         this.ctx.font = '32px serif';
         this.ctx.fillStyle = '#ffffff';
-        this.ctx.fillText(text, x, y);
+        this.ctx.fillText(text, cp.cx, cp.cy);
     }
 
-    drawTextLines(x: number, y: number, ...textLines: string[]): void {
+    drawTextLines(cp: CanvasPoint, ...textLines: string[]): void {
 
         if (!this.ctx) {
             return;
@@ -81,11 +86,11 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.fillStyle = '#ffffff';
 
         textLines.forEach((text, index) => {
-            this.ctx?.fillText(text, x, y + index * 40);
+            this.ctx?.fillText(text, cp.cx, cp.cy + index * 40);
         });
     }
 
-    drawLineInit(x: number, y: number): void {
+    drawLineInit(cp: CanvasPoint): void {
 
         if (!this.ctx) {
             return;
@@ -93,26 +98,26 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         this.ctx.strokeStyle = '#ffffff';
         this.ctx.beginPath();
-        this.ctx.moveTo(x, y);
+        this.ctx.moveTo(cp.cx, cp.cy);
     }
 
-    drawLineTransformedInit(x: number, y: number): void {
+    drawLineTransformedInit(p: Point): void {
 
-        this.drawLineInit(this.transformX(x), this.transformY(y));
+        this.drawLineInit(this.transformToCanvasCoords(p));
     }
 
-    drawLine(x: number, y: number): void {
+    drawLine(cp: CanvasPoint): void {
 
         if (!this.ctx) {
             return;
         }
 
-        this.ctx.lineTo(x, y);
+        this.ctx.lineTo(cp.cx, cp.cy);
     }
 
-    drawLineTransformed(x: number, y: number): void {
+    drawLineTransformed(p: Point): void {
 
-        this.drawLine(this.transformX(x), this.transformY(y));
+        this.drawLine(this.transformToCanvasCoords(p));
     }
 
     drawLineFinish(): void {
@@ -125,13 +130,13 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     }
 
     // see https://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
-    drawPixel(x: number, y: number, r: number, g: number, b: number): void {
+    drawPixel(cp: CanvasPoint, r: number, g: number, b: number): void {
 
         if (!this.canvasData) {
             return;
         }
 
-        const index = (x + y * Number(this.props.canvasProps.width)) * 4;
+        const index = (cp.cx + cp.cy * Number(this.props.canvasProps.width)) * 4;
 
         this.canvasData.data[ index ] = r;
         this.canvasData.data[ index + 1 ] = g;
@@ -150,31 +155,30 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
     determineOffset(movementX = 0, movementY = 0): void {
 
-        this.mouseOffset = {
-            x: this.mouseOffset.x + movementX / this.zoom,
-            y: this.mouseOffset.y + movementY / this.zoom,
+        this.coordOffset = {
+            x: this.coordOffset.x + movementX / this.zoom,
+            y: this.coordOffset.y + movementY / this.zoom,
         };
 
         this.coordOriginOnCanvas = {
-            x: this.mouseOffset.x * this.zoom + this.center.x,
-            y: this.mouseOffset.y * this.zoom + this.center.y,
+            cx: this.coordOffset.x * this.zoom + this.center.cx,
+            cy: this.coordOffset.y * this.zoom + this.center.cy,
         };
     }
 
-    getCoordByCanvasCoord(canvasX: number, canvasY: number): { x: number, y: number } {
+    transformToCoords(cp: CanvasPoint): Point {
 
         return {
-            x: (canvasX - this.coordOriginOnCanvas.x) / this.zoom,
-            y: (canvasY - this.coordOriginOnCanvas.y) / this.zoom,
+            x: (cp.cx - this.coordOriginOnCanvas.cx) / this.zoom,
+            y: (cp.cy - this.coordOriginOnCanvas.cy) / this.zoom,
         };
     }
 
-    transformX(x: number): number {
-        return x * this.zoom + this.coordOriginOnCanvas.x;
-    };
-
-    transformY(y: number): number {
-        return y * this.zoom + this.coordOriginOnCanvas.y;
+    transformToCanvasCoords(p: Point): CanvasPoint {
+        return {
+            cx: p.x * this.zoom + this.coordOriginOnCanvas.cx,
+            cy: p.y * this.zoom + this.coordOriginOnCanvas.cy,
+        };
     };
 
     mouseDown(): void {

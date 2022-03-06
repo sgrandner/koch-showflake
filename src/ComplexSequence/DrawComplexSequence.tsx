@@ -46,23 +46,23 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
     calculateMandelbrot(x: number, y: number): Color {
 
         const thresholdSquared = 10;
-        const iterationMax = 2000;
+        const iterationMax = 100;
         let iterationCount = undefined;
 
-        const cRe = x;
-        const cIm = y;
-        let zRe = 0;
-        let zIm = 0;
+        const c: Complex = { re: x, im: y };
+        let z: Complex = { re: 0, im: 0 };
+
 
         for (let index = 0; index < iterationMax; index++) {
 
-            const zReTemp = zRe ** 2 - zIm ** 2 + cRe;
-            const zImTemp = 2 * zRe * zIm + cIm;
+            const zTemp: Complex = {
+                re: z.re ** 2 - z.im ** 2 + c.re,
+                im: 2 * z.re * z.im + c.im,
+            };
 
-            zRe = zReTemp;
-            zIm = zImTemp;
+            z = zTemp;
             
-            if (zRe ** 2 + zIm ** 2 > thresholdSquared) {
+            if (z.re ** 2 + z.im ** 2 > thresholdSquared) {
                 iterationCount = index;
                 break;
             }
@@ -87,29 +87,28 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
             const deltaX = 1;
             const deltaY = 1;
     
-            for (let y = 0; y < Number(this.props.canvasProps.height); y += deltaX) {
-                for (let x = 0; x < Number(this.props.canvasProps.width); x += deltaY) {
+            for (let cy = 0; cy < Number(this.props.canvasProps.height); cy += deltaX) {
+                for (let cx = 0; cx < Number(this.props.canvasProps.width); cx += deltaY) {
     
-                    const point = canvas?.getCoordByCanvasCoord(x, y);
+                    const point = canvas?.transformToCoords({ cx, cy });
     
                     if (!!point) {
                         const color = this.calculateMandelbrot(point.x, point.y);
-                        canvas?.drawPixel(x, y, color.r, color.g, color.b);
+                        canvas?.drawPixel({ cx, cy }, color.r, color.g, color.b);
                     }
                 }
             }
             canvas?.drawPixelsFinish();
     
-            canvas?.drawLineTransformedInit(-1000, 0);
-            canvas?.drawLineTransformed(1000, 0);
+            canvas?.drawLineTransformedInit({ x: -1000, y: 0});
+            canvas?.drawLineTransformed({ x: 1000, y: 0});
             canvas?.drawLineFinish();
-            canvas?.drawLineTransformedInit(0, -1000);
-            canvas?.drawLineTransformed(0, 1000);
+            canvas?.drawLineTransformedInit({ x: 0, y: -1000});
+            canvas?.drawLineTransformed({ x: 0, y: 1000});
             canvas?.drawLineFinish();
 
             canvas?.drawTextLines(
-                20,
-                20,
+                { cx: 20, cy: 20 },
                 `calculation and draw time: ${this.calculationDrawTime} ms`,
             );
         });

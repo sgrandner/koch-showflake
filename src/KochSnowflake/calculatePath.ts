@@ -1,20 +1,21 @@
+import { Point } from 'electron';
+
 export type CalculatePathProps = {
-    x0: number;
-    y0: number;
+    p0: Point;
     stepCount: number;
     anglePlus: number | undefined;
     angleMinus: number | undefined;
     resultRule: string;
     growthFactor: number;
-    drawCallback?: (x: number, y: number) => void;
+    drawCallback?: (p: Point) => void;
 };
 
 const LENGTH_UNIT = 600.0;
 
 export const calculatePath = (props: CalculatePathProps) => {
 
-    let x = props.x0;
-    let y = props.y0;
+    let x = props.p0.x;
+    let y = props.p0.y;
 
     let length = LENGTH_UNIT / props.growthFactor ** props.stepCount;
     let angle = 0;
@@ -40,7 +41,7 @@ export const calculatePath = (props: CalculatePathProps) => {
                 y -= Math.sin(angle) * length;
 
                 if (typeof props.drawCallback === 'function') {
-                    props.drawCallback(x, y);
+                    props.drawCallback({ x, y });
                 }
         }
     }
