@@ -1,18 +1,9 @@
 import React, { RefObject } from 'react';
 
+import { Color } from '../_domain/Color';
+import { Complex } from '../_domain/Complex';
 import CanvasContainer from '../Canvas/CanvasContainer';
 import measureTime from '../Utils/measureTime';
-
-type Color = {
-    r: number;
-    g: number;
-    b: number;
-}
-
-type Complex = {
-    re: number;
-    im: number;
-}
 
 type DrawComplexSequenceProps = {
     canvasProps: { width: string, height: string };
