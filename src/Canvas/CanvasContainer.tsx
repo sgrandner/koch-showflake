@@ -5,6 +5,8 @@ import React, { RefObject } from 'react';
 import { CanvasPoint } from '../_domain/CanvasPoint';
 import { Point } from '../_domain/Point';
 
+const BACKGROUND_COLOR = '#000000';
+
 enum Zoom {
     IN,
     OUT,
@@ -51,7 +53,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         if (!!canvas) {
             this.ctx = canvas.getContext('2d');
-            this.canvasData = this.ctx?.getImageData(0, 0, Number(this.props.canvasProps.width), Number(this.props.canvasProps.height));
+            this.getCanvasData();
         }
     }
 
@@ -61,8 +63,64 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.ctx.fillStyle = '#000000';
+        this.ctx.fillStyle = BACKGROUND_COLOR;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
+
+    clearBorderAfterDrag(offset: CanvasPoint): void {
+
+        if (!this.ctx) {
+            return;
+        }
+
+        const width = this.ctx.canvas.width;
+        const height = this.ctx.canvas.height;
+
+        if (offset.cy !== 0) {
+            
+            let x1, x2;
+            if (offset.cx > 0) {
+                x1 = 0;
+                x2 = offset.cx;
+            } else {
+                x1 = width + offset.cx;
+                x2 = width;
+            }
+            
+            this.ctx.fillStyle = BACKGROUND_COLOR;
+            this.ctx.fillRect(x1, 0, x2, height);
+        }
+        
+        if (offset.cy !== 0) {
+            
+            let y1, y2;
+            if (offset.cy > 0) {
+                y1 = 0;
+                y2 = offset.cy;
+            } else {
+                y1 = height + offset.cy;
+                y2 = height;
+            }
+    
+            this.ctx.fillStyle = BACKGROUND_COLOR;
+            this.ctx.fillRect(0, y1, width, y2);
+        }
+    }
+
+    getCanvasData(): void {
+        
+        this.canvasData = this.ctx?.getImageData(0, 0, Number(this.props.canvasProps.width), Number(this.props.canvasProps.height));
+    }
+
+    drawCanvasData(offset: CanvasPoint): void {
+
+        this.getCanvasData();
+
+        if (this.canvasData) {
+            this.ctx?.putImageData(this.canvasData, offset.cx, offset.cy);
+        }
+
+        this.clearBorderAfterDrag(offset);
     }
 
     drawText(cp: CanvasPoint, text: string | undefined): void {
@@ -206,6 +264,8 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         }
 
         this.determineOffset($event.movementX, $event.movementY);
+
+        this.drawCanvasData({ cx: $event.movementX, cy: $event.movementY });
 
         this.props.onMouseDrag();
     }

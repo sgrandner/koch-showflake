@@ -109,7 +109,8 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
     handleMouseDrag(): void {
 
         if (this.calculationDrawTime <= 100) {
-            this.draw();
+            // TODO draw only new values which were not drawn before
+            // this.draw();
         }
     }
 
