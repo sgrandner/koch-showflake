@@ -2,6 +2,7 @@ import './CanvasContainer.css';
 
 import React, { RefObject } from 'react';
 
+import { CanvasBox } from '../_domain/CanvasBox';
 import { CanvasPoint } from '../_domain/CanvasPoint';
 import { Point } from '../_domain/Point';
 
@@ -14,7 +15,7 @@ enum Zoom {
 
 type CanvasContainerProps = {
     canvasProps: { width: string, height: string };
-    onMouseDrag?: () => void | undefined;
+    onMouseDrag?: (dragBorderBoxes: CanvasBox[]) => void | undefined;
     onMouseDragFinish?: () => void | undefined;
     onZoom?: () => void | undefined;
 };
@@ -67,44 +68,58 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    clearBorderAfterDrag(offset: CanvasPoint): void {
+    determineDragBorderBoxes(offset: CanvasPoint): CanvasBox[] {
+
+        const boxes: CanvasBox[] = [];
 
         if (!this.ctx) {
-            return;
+            return boxes;
         }
 
         const width = this.ctx.canvas.width;
         const height = this.ctx.canvas.height;
-
-        if (offset.cy !== 0) {
+        
+        if (offset.cx !== 0) {
             
-            let x1, x2;
+            let cx1, cx2;
+            
             if (offset.cx > 0) {
-                x1 = 0;
-                x2 = offset.cx;
+                cx1 = 0;
+                cx2 = offset.cx;
             } else {
-                x1 = width + offset.cx;
-                x2 = width;
+                cx1 = width + offset.cx;
+                cx2 = width;
             }
             
-            this.ctx.fillStyle = BACKGROUND_COLOR;
-            this.ctx.fillRect(x1, 0, x2, height);
+            boxes.push({
+                cx1,
+                cy1: 0,
+                cx2,
+                cy2: height,
+            });
         }
         
         if (offset.cy !== 0) {
             
-            let y1, y2;
+            let cy1, cy2;
+
             if (offset.cy > 0) {
-                y1 = 0;
-                y2 = offset.cy;
+                cy1 = 0;
+                cy2 = offset.cy;
             } else {
-                y1 = height + offset.cy;
-                y2 = height;
+                cy1 = height + offset.cy;
+                cy2 = height;
             }
-    
-            this.ctx.fillStyle = BACKGROUND_COLOR;
-            this.ctx.fillRect(0, y1, width, y2);
+            
+            boxes.push({
+                cx1: 0,
+                cy1,
+                cx2: width,
+                cy2,
+            });
         }
+
+        return boxes;
     }
 
     getCanvasData(): void {
@@ -112,7 +127,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.canvasData = this.ctx?.getImageData(0, 0, Number(this.props.canvasProps.width), Number(this.props.canvasProps.height));
     }
 
-    drawCanvasData(offset: CanvasPoint): void {
+    drawCanvasData(offset: CanvasPoint, dragBorderBoxes: CanvasBox[]): void {
 
         this.getCanvasData();
 
@@ -120,7 +135,18 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             this.ctx?.putImageData(this.canvasData, offset.cx, offset.cy);
         }
 
-        this.clearBorderAfterDrag(offset);
+        dragBorderBoxes.forEach((box: CanvasBox) => {
+
+            if (!this.ctx) {
+                return;
+            }
+
+            this.ctx.fillStyle = BACKGROUND_COLOR;
+            this.ctx.fillRect(box.cx1, box.cy1, box.cx2, box.cy2);
+        });
+
+        // NOTE update canvasData for using drawPixel afterwards !
+        this.getCanvasData();
     }
 
     drawText(cp: CanvasPoint, text: string | undefined): void {
@@ -263,11 +289,14 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
+        const offset = { cx: $event.movementX, cy: $event.movementY };
+
         this.determineOffset($event.movementX, $event.movementY);
 
-        this.drawCanvasData({ cx: $event.movementX, cy: $event.movementY });
+        const dragBorderBoxes = this.determineDragBorderBoxes(offset);
+        this.drawCanvasData(offset, dragBorderBoxes);
 
-        this.props.onMouseDrag();
+        this.props.onMouseDrag(dragBorderBoxes);
     }
 
     zoomIn(): void {

@@ -1,5 +1,6 @@
 import React, { RefObject } from 'react';
 
+import { CanvasBox } from '../_domain/CanvasBox';
 import { Color } from '../_domain/Color';
 import { Complex } from '../_domain/Complex';
 import CanvasContainer from '../Canvas/CanvasContainer';
@@ -59,38 +60,60 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
             }
         }
 
-        const colorValue = iterationCount !== undefined ? iterationCount * 2 % 155 + 100 : 0;
+        const colorValue = iterationCount !== undefined ? iterationCount * 20 % 155 + 100 : 0;
         return {
             r: colorValue,
-            g: colorValue,
+            g: colorValue * 0.7,
             b: 0,
         };
     }
 
-    draw(): void {
+    draw(dragBorderBoxes?: CanvasBox[]): void {
 
         const canvas = this.canvasContainerRef.current;
 
-        canvas?.clearCanvas();
+        // canvas?.clearCanvas();
+
+        const drawBoxes: CanvasBox[] = [];
+
+        if (!!dragBorderBoxes) {
+
+            drawBoxes.push(...dragBorderBoxes);
+
+        } else {
+
+            drawBoxes.push(
+                {
+                    cx1: 0,
+                    cy1: 0,
+                    cx2: Number(this.props.canvasProps.width),
+                    cy2: Number(this.props.canvasProps.height),
+                },
+            );
+        }
 
         this.calculationDrawTime = measureTime(() => {
 
             const deltaX = 1;
             const deltaY = 1;
     
-            for (let cy = 0; cy < Number(this.props.canvasProps.height); cy += deltaX) {
-                for (let cx = 0; cx < Number(this.props.canvasProps.width); cx += deltaY) {
-    
-                    const point = canvas?.transformToCoords({ cx, cy });
-    
-                    if (!!point) {
-                        const color = this.calculateMandelbrot(point.x, point.y);
-                        canvas?.drawPixel({ cx, cy }, color.r, color.g, color.b);
+            drawBoxes.forEach((box: CanvasBox) => { 
+
+                for (let cx = box.cx1; cx < box.cx2; cx += deltaY) {
+                    for (let cy = box.cy1; cy < box.cy2; cy += deltaX) {
+        
+                        const point = canvas?.transformToCoords({ cx, cy });
+        
+                        if (!!point) {
+                            const color = this.calculateMandelbrot(point.x, point.y);
+                            canvas?.drawPixel({ cx, cy }, color.r, color.g, color.b);
+                        }
                     }
                 }
-            }
+            });
+
             canvas?.drawPixelsFinish();
-    
+            
             canvas?.drawLineTransformedInit({ x: -1000, y: 0});
             canvas?.drawLineTransformed({ x: 1000, y: 0});
             canvas?.drawLineFinish();
@@ -98,19 +121,22 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
             canvas?.drawLineTransformed({ x: 0, y: 1000});
             canvas?.drawLineFinish();
 
-            canvas?.drawTextLines(
-                { cx: 20, cy: 20 },
-                `calculation and draw time: ${this.calculationDrawTime} ms`,
-            );
-        });
+            if (!dragBorderBoxes) {
 
+                canvas?.drawTextLines(
+                    { cx: 20, cy: 20 },
+                    `calculation and draw time: ${this.calculationDrawTime} ms`,
+                );
+            }
+
+        });
     }
 
-    handleMouseDrag(): void {
+    handleMouseDrag(dragBorderBoxes: CanvasBox[]): void {
 
-        if (this.calculationDrawTime <= 100) {
-            // TODO draw only new values which were not drawn before
-            // this.draw();
+        // FIXME calculationDrawTime is still large from complete calculation !!! should be resetted for dragging
+        if (this.calculationDrawTime <= 1000) {
+            this.draw(dragBorderBoxes);
         }
     }
 
