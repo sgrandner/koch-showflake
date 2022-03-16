@@ -174,6 +174,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 <CanvasContainer
                     ref={this.canvasContainerRef}
                     canvasProps={this.props.canvasProps}
+                    initialZoom={0.5}
                     onMouseDrag={this.handleMouseDrag.bind(this)}
                     onMouseDragFinish={this.handleMouseDragFinish.bind(this)}
                     onZoom={this.handleZoom.bind(this)}

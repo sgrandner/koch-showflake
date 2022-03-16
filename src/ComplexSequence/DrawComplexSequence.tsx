@@ -154,6 +154,7 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
                 <CanvasContainer
                     ref={this.canvasContainerRef}
                     canvasProps={this.props.canvasProps}
+                    initialZoom={200}
                     onMouseDrag={this.handleMouseDrag.bind(this)}
                     onMouseDragFinish={this.handleMouseDragFinish.bind(this)}
                     onZoom={this.handleZoom.bind(this)}

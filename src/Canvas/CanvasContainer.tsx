@@ -15,6 +15,7 @@ enum Zoom {
 
 type CanvasContainerProps = {
     canvasProps: { width: string, height: string };
+    initialZoom?: number | undefined;
     onMouseDrag?: (dragBorderBoxes: CanvasBox[]) => void | undefined;
     onMouseDragFinish?: () => void | undefined;
     onZoom?: () => void | undefined;
@@ -30,7 +31,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
     coordOriginOnCanvas: CanvasPoint;
     center: CanvasPoint;
     dragActive = false;
-    zoom = 200;
+    zoom: number;
     ZOOM_STEP = 1.5;
 
     constructor(props: CanvasContainerProps) {
@@ -44,6 +45,8 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             cx: Number(this.props.canvasProps.width) * 0.5,
             cy: Number(this.props.canvasProps.height) * 0.5,
         };
+
+        this.zoom = this.props.initialZoom || 1;
 
         this.determineOffset(150, 0);
     }

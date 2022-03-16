@@ -16,7 +16,7 @@ class ComplexSequence extends React.Component<ComplexSequenceProps> {
         return (
             <div className='koch-snowflake'>
                 <DrawComplexSequence
-                    canvasProps={{ width: '600', height: '600' }}
+                    canvasProps={{ width: '800', height: '600' }}
                 />
             </div>
         );

@@ -1,0 +1,19 @@
+.field-with-changer {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+}
+
+.changer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.changer__button {
+    width: 15px;
+    height: 15px;
+    font-size: 13px;
+    line-height: 13px;
+    padding: 0;
+}
