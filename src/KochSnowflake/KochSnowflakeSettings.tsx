@@ -211,4 +211,4 @@ const KochSnowflakeSettingsConnected = connect(mapStateToProps)(KochSnowflakeSet
 //      connects form with redux store
 export default reduxForm({
     form: 'kochSettings',
-})(KochSnowflakeSettingsConnected);;
+})(KochSnowflakeSettingsConnected);

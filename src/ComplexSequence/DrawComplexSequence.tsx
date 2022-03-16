@@ -8,6 +8,7 @@ import measureTime from '../Utils/measureTime';
 
 type DrawComplexSequenceProps = {
     canvasProps: { width: string, height: string };
+    iterationMax: number;
 };
 
 class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
@@ -38,14 +39,13 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
     calculateMandelbrot(x: number, y: number): Color {
 
         const thresholdSquared = 10;
-        const iterationMax = 100;
         let iterationCount = undefined;
 
         const c: Complex = { re: x, im: y };
         let z: Complex = { re: 0, im: 0 };
 
 
-        for (let index = 0; index < iterationMax; index++) {
+        for (let index = 0; index < this.props.iterationMax; index++) {
 
             const zTemp: Complex = {
                 re: z.re ** 2 - z.im ** 2 + c.re,
@@ -140,6 +140,7 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
         }
     }
 
+    // TODO only calculate and draw new values as for dragging
     handleMouseDragFinish(): void {
         this.draw();
     }
