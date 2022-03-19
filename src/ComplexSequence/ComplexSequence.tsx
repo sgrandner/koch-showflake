@@ -12,8 +12,6 @@ type ComplexSequenceProps = {
     iterationMax: number;
 };
 
-export const MAX_STEPS = 16;
-
 class ComplexSequence extends React.Component<ComplexSequenceProps> {
 
     submit(values: any) {
@@ -29,7 +27,7 @@ class ComplexSequence extends React.Component<ComplexSequenceProps> {
             <div className='koch-snowflake'>
                 <ComplexSequenceSettings onSubmit={this.submit.bind(this)}/>
                 <DrawComplexSequence
-                    canvasProps={{ width: '800', height: '600' }}
+                    canvasProps={{ width: '700', height: '500' }}
                     iterationMax={this.props.iterationMax}
                 />
             </div>

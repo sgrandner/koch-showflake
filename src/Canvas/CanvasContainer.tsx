@@ -6,7 +6,8 @@ import { CanvasBox } from '../_domain/CanvasBox';
 import { CanvasPoint } from '../_domain/CanvasPoint';
 import { Point } from '../_domain/Point';
 
-const BACKGROUND_COLOR = '#000000';
+const DEFAULT_FOREGROUND_COLOR = '#ffffff';
+const DEFAULT_BACKGROUND_COLOR = '#000000';
 
 enum Zoom {
     IN,
@@ -14,8 +15,15 @@ enum Zoom {
 }
 
 type CanvasContainerProps = {
-    canvasProps: { width: string, height: string };
+    canvasProps: {
+        width: string,
+        height: string,
+        foregroundColor?: string,
+        backgroundColor?: string,
+    };
+    initialCenter?: CanvasPoint | undefined;
     initialZoom?: number | undefined;
+    initialOffset?: CanvasPoint | undefined;
     onMouseDrag?: (dragBorderBoxes: CanvasBox[]) => void | undefined;
     onMouseDragFinish?: () => void | undefined;
     onZoom?: () => void | undefined;
@@ -43,13 +51,13 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.coordOffset = { x: 0, y: 0 };
         this.coordOriginOnCanvas = { cx: 0, cy: 0 };
         this.center = {
-            cx: Number(this.props.canvasProps.width) * 0.5,
-            cy: Number(this.props.canvasProps.height) * 0.5,
+            cx: this.props.initialCenter?.cx || Number(this.props.canvasProps.width) * 0.5,
+            cy: this.props.initialCenter?.cy || Number(this.props.canvasProps.height) * 0.5,
         };
 
         this.zoom = this.props.initialZoom || 1;
 
-        this.determineOffset(150, 0);
+        this.determineOffset(this.props.initialOffset?.cx || 0, this.props.initialOffset?.cy || 0);
     }
 
     componentDidMount(): void {
@@ -68,7 +76,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.ctx.fillStyle = BACKGROUND_COLOR;
+        this.ctx.fillStyle = this.props.canvasProps.backgroundColor || DEFAULT_BACKGROUND_COLOR;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
@@ -145,7 +153,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
                 return;
             }
 
-            this.ctx.fillStyle = BACKGROUND_COLOR;
+            this.ctx.fillStyle = this.props.canvasProps.backgroundColor || DEFAULT_BACKGROUND_COLOR;
             this.ctx.fillRect(box.cx1, box.cy1, box.cx2, box.cy2);
         });
 
@@ -160,7 +168,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         }
 
         this.ctx.font = '32px serif';
-        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillStyle = this.props.canvasProps.foregroundColor || DEFAULT_FOREGROUND_COLOR;
         this.ctx.fillText(text, cp.cx, cp.cy);
     }
 
@@ -171,7 +179,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         }
 
         this.ctx.font = '15px serif';
-        this.ctx.fillStyle = '#ffffff';
+        this.ctx.fillStyle = this.props.canvasProps.foregroundColor || DEFAULT_FOREGROUND_COLOR;
 
         textLines.forEach((text, index) => {
             this.ctx?.fillText(text, cp.cx, cp.cy + index * 20);
@@ -184,7 +192,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
             return;
         }
 
-        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.strokeStyle = this.props.canvasProps.foregroundColor || DEFAULT_FOREGROUND_COLOR;
         this.ctx.beginPath();
         this.ctx.moveTo(cp.cx, cp.cy);
     }
@@ -342,6 +350,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         this.determineOffset($event.movementX, $event.movementY);
 
+        // TODO control this by config (fractal curves do not need this)
         const dragBorderBoxes = this.determineDragBorderBoxes(offset);
         this.drawCanvasData(offset, dragBorderBoxes);
 
@@ -382,6 +391,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         return (
             <>
                 <canvas
+                    style={{ width: this.props.canvasProps.width, height: this.props.canvasProps.height }}
                     ref={this.canvasRef}
                     {...this.props.canvasProps}
                     onMouseDown={this.mouseDown.bind(this)}
