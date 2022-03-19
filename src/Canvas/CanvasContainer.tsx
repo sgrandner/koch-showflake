@@ -19,6 +19,7 @@ type CanvasContainerProps = {
     onMouseDrag?: (dragBorderBoxes: CanvasBox[]) => void | undefined;
     onMouseDragFinish?: () => void | undefined;
     onZoom?: () => void | undefined;
+    onMouseRightClick?: (p: Point) => void | undefined;
 };
 
 class CanvasContainer extends React.Component<CanvasContainerProps> {
@@ -173,7 +174,7 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
         this.ctx.fillStyle = '#ffffff';
 
         textLines.forEach((text, index) => {
-            this.ctx?.fillText(text, cp.cx, cp.cy + index * 40);
+            this.ctx?.fillText(text, cp.cx, cp.cy + index * 20);
         });
     }
 
@@ -257,29 +258,74 @@ class CanvasContainer extends React.Component<CanvasContainerProps> {
 
         return {
             x: (cp.cx - this.coordOriginOnCanvas.cx) / this.zoom,
-            y: (cp.cy - this.coordOriginOnCanvas.cy) / this.zoom,
+            y: -(cp.cy - this.coordOriginOnCanvas.cy) / this.zoom,
         };
     }
 
     transformToCanvasCoords(p: Point): CanvasPoint {
         return {
             cx: p.x * this.zoom + this.coordOriginOnCanvas.cx,
-            cy: p.y * this.zoom + this.coordOriginOnCanvas.cy,
+            cy: -p.y * this.zoom + this.coordOriginOnCanvas.cy,
         };
     };
 
-    mouseDown(): void {
-        this.dragActive = true;
+    mouseDown($event: React.MouseEvent): void {
+        
+        switch ($event.button) {
+            // left click
+            case 0:
+                this.dragActive = true;
+                break;
+            default:
+                break;
+        }
     }
 
-    mouseUp(): void {
+    mouseUp($event: React.MouseEvent): void {
+        
         this.dragActive = false;
+
+        switch ($event.button) {
+            // left click
+            case 0:
+                this.mouseUpLeft();
+                break;
+            // right click
+            case 2:
+                this.mouseUpRight($event);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private mouseUpLeft(): void {
 
         if (!this.props?.onMouseDragFinish) {
             return;
         }
 
         this.props.onMouseDragFinish();
+    }
+
+    private mouseUpRight($event: React.MouseEvent): void {
+
+        if (!this.props?.onMouseRightClick) {
+            return;
+        }
+
+        const canvasClientRect = $event.currentTarget.getBoundingClientRect();
+
+        if (isNaN(canvasClientRect?.x) || isNaN(canvasClientRect?.y)) {
+            return;
+        }
+
+        const point: CanvasPoint = {
+            cx: $event.clientX - canvasClientRect.x,
+            cy: $event.clientY - canvasClientRect.y,
+        };
+
+        this.props.onMouseRightClick(this.transformToCoords(point));
     }
 
     mouseMove($event: React.MouseEvent): void {

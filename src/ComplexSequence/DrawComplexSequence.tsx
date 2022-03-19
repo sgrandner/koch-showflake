@@ -3,6 +3,7 @@ import React, { RefObject } from 'react';
 import { CanvasBox } from '../_domain/CanvasBox';
 import { Color } from '../_domain/Color';
 import { Complex } from '../_domain/Complex';
+import { Point } from '../_domain/Point';
 import CanvasContainer from '../Canvas/CanvasContainer';
 import measureTime from '../Utils/measureTime';
 
@@ -20,6 +21,8 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
 
     calculationDrawTime = 0;
     updateCount = 0;
+
+    selectedPoint: Point | undefined;
 
     constructor(props: DrawComplexSequenceProps) {
 
@@ -126,6 +129,7 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
                 canvas?.drawTextLines(
                     { cx: 20, cy: 20 },
                     `calculation and draw time: ${this.calculationDrawTime} ms`,
+                    `selected point: ${this.selectedPoint?.x}, ${this.selectedPoint?.y}`,
                 );
             }
 
@@ -149,6 +153,13 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
         this.draw();
     }
 
+    handleMouseRightClick(point: Point): void {
+
+        this.selectedPoint = point;
+        // TODO get rid of draw (just for printing selected point on canvas for the moment)
+        this.draw();
+    }
+
     render() {
         return (
             <div>
@@ -159,6 +170,7 @@ class DrawComplexSequence extends React.Component<DrawComplexSequenceProps> {
                     onMouseDrag={this.handleMouseDrag.bind(this)}
                     onMouseDragFinish={this.handleMouseDragFinish.bind(this)}
                     onZoom={this.handleZoom.bind(this)}
+                    onMouseRightClick={this.handleMouseRightClick.bind(this)}
                 />
 
                 <div>update count: {++this.updateCount}</div>
