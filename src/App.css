@@ -2,6 +2,15 @@
     margin: 20px;
 }
 
-header {
-    margin-bottom: 12px;
+.navigation {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.navigation__entry {
+    margin-right: 30px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
 }

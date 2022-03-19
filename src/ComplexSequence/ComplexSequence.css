@@ -1,0 +1,4 @@
+.complex-sequence {
+    display: flex;
+    flex-direction: row;
+}

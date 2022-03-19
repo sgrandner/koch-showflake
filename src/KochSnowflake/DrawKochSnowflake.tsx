@@ -1,6 +1,7 @@
 import React, { RefObject } from 'react';
 import { connect } from 'react-redux';
 
+import { Point } from '../_domain/Point';
 import CanvasContainer from '../Canvas/CanvasContainer';
 import { RootState } from '../Store/rootReducer';
 import measureTime from '../Utils/measureTime';
@@ -64,7 +65,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         canvas?.clearCanvas();
 
         if (!(this.props.stepCount >= 0 && this.props.stepCount <= MAX_STEPS)) {
-            canvas?.drawText(30, 50, `too many recursion steps (max. ${MAX_STEPS}) !`);
+            canvas?.drawText({ cx: 30, cy: 50 }, `too many recursion steps (max. ${MAX_STEPS}) !`);
             return;
         }
 
@@ -76,8 +77,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         }
 
         canvas?.drawTextLines(
-            20,
-            40,
+            { cx: 20, cy: 40 },
             this.props.calculationType,
             `${this.props.resultRule.length} segments`,
             recursionIterationCountText || '',
@@ -89,20 +89,19 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
         this.drawTime = measureTime(() => {
 
-            canvas?.drawLineTransformedInit(x0, y0);
+            canvas?.drawLineTransformedInit({ x: x0, y: y0 });
 
             const growthFactor = this.calculateGrowthFactor();
 
             calculatePath({
-                x0,
-                y0,
+                p0: { x: x0, y: y0 },
                 stepCount: this.props.stepCount,
                 anglePlus: this.props.anglePlus,
                 angleMinus: this.props.angleMinus,
                 resultRule: this.props.resultRule,
                 growthFactor,
-                drawCallback: (x: number, y: number) => {
-                    canvas?.drawLineTransformed(x, y);
+                drawCallback: (p: Point) => {
+                    canvas?.drawLineTransformed({ x: p.x, y: p.y });
                 }
             });
 
@@ -110,8 +109,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
         });
 
         canvas?.drawTextLines(
-            20,
-            1450,
+            { cx: 20, cy: 1450 },
             `calculation time: ${this.props.calculationTime} ms`,
             `draw time: ${this.drawTime} ms`,
         );
@@ -124,29 +122,27 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
 
         // NOTE length of path for step 0
         calculatePath({
-            x0: 0,
-            y0: 0,
+            p0: { x: 0, y: 0 },
             stepCount: 0,
             anglePlus: this.props.anglePlus,
             angleMinus: this.props.angleMinus,
             resultRule: this.props.resultRule0,
             growthFactor: 1,
-            drawCallback: (x: number, y: number) => {
-                length0 = Math.sqrt(x ** 2 + y ** 2);
+            drawCallback: (p: Point) => {
+                length0 = Math.sqrt(p.x ** 2 + p.y ** 2);
             }
         });
 
         // NOTE length of path for step 1
         calculatePath({
-            x0: 0,
-            y0: 0,
+            p0: { x: 0, y: 0 },
             stepCount: 1,
             anglePlus: this.props.anglePlus,
             angleMinus: this.props.angleMinus,
             resultRule: this.props.resultRule1,
             growthFactor: 1,
-            drawCallback: (x: number, y: number) => {
-                length1 = Math.sqrt(x ** 2 + y ** 2);
+            drawCallback: (p: Point) => {
+                length1 = Math.sqrt(p.x ** 2 + p.y ** 2);
             }
         });
 
@@ -178,6 +174,7 @@ class DrawKochSnowflake extends React.Component<DrawKochSnowflakeProps> {
                 <CanvasContainer
                     ref={this.canvasContainerRef}
                     canvasProps={this.props.canvasProps}
+                    initialZoom={0.5}
                     onMouseDrag={this.handleMouseDrag.bind(this)}
                     onMouseDragFinish={this.handleMouseDragFinish.bind(this)}
                     onZoom={this.handleZoom.bind(this)}

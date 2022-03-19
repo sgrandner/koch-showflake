@@ -1,10 +1,7 @@
 import './KochSnowflake.css';
 
 import React from 'react';
-import {
-    connect,
-    DispatchProp,
-} from 'react-redux';
+import { connect, DispatchProp } from 'react-redux';
 
 import { RootState } from '../Store/rootReducer';
 import { setKochSnowflakeSettings } from '../Store/settingsActions';
@@ -165,7 +162,7 @@ class KochSnowflake extends React.Component<KochSnowflakeProps> {
             <div className='koch-snowflake'>
                 <KochSnowflakeSettings onSubmit={this.submit.bind(this)}/>
                 <DrawKochSnowflake
-                    canvasProps={{ width: '1800', height: '1600' }}
+                    canvasProps={{ width: '800', height: '600' }}
                     stepCount={this.props.stepCount}
                     calculationType={this.calculationType}
                     resultRule={this.resultRule}

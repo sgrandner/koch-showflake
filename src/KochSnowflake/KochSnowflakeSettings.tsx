@@ -2,13 +2,9 @@ import './KochSnowflakeSettings.css';
 
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-    Field,
-    formValueSelector,
-    InjectedFormProps,
-    reduxForm,
-} from 'redux-form';
+import { Field, formValueSelector, InjectedFormProps, reduxForm } from 'redux-form';
 
+import FormFieldChanger from '../Form/FieldWithChanger';
 import { RootState } from '../Store/rootReducer';
 import { angleRadToDeg } from '../Utils/angleUtils';
 import { MAX_STEPS } from './KochSnowflake';
@@ -150,10 +146,12 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                             <option value="gosper">Gosper-Kurve</option>
                         </Field>
 
-                        <label htmlFor="stepCount">Schritte</label>
-                        <Field className='settings__input' name="stepCount" component="input" type="text" />
-                        <button onClick={this.increaseStepCount.bind(this)}>+</button>
-                        <button onClick={this.decreaseStepCount.bind(this)}>-</button>
+                        <FormFieldChanger
+                            name='stepCount'
+                            label='Schritte'
+                            onIncrease={this.increaseStepCount.bind(this)}
+                            onDecrease={this.decreaseStepCount.bind(this)}
+                        />
 
                         <label htmlFor="startWord">Startwort</label>
                         <Field className='settings__input' name="startWord" component="input" type="text" />
@@ -164,15 +162,19 @@ class KochSnowflakeSettings extends React.Component<InjectedFormProps & KochSnow
                         <label htmlFor="ruleA">Regel B</label>
                         <Field className='settings__input' name="ruleB" component="input" type="text" />
 
-                        <label htmlFor="anglePlus">Winkel +</label>
-                        <Field className='settings__input' name="anglePlus" component="input" type="text" />
-                        <button onClick={this.increaseAnglePlus.bind(this)}>+</button>
-                        <button onClick={this.decreaseAnglePlus.bind(this)}>-</button>
+                        <FormFieldChanger
+                            name='anglePlus'
+                            label='Winkel +'
+                            onIncrease={this.increaseAnglePlus.bind(this)}
+                            onDecrease={this.decreaseAnglePlus.bind(this)}
+                        />
 
-                        <label htmlFor="angleMinus">Winkel -</label>
-                        <Field className='settings__input' name="angleMinus" component="input" type="text" />
-                        <button onClick={this.increaseAngleMinus.bind(this)}>+</button>
-                        <button onClick={this.decreaseAngleMinus.bind(this)}>-</button>
+                        <FormFieldChanger
+                            name='angleMinus'
+                            label='Winkel -'
+                            onIncrease={this.increaseAngleMinus.bind(this)}
+                            onDecrease={this.decreaseAngleMinus.bind(this)}
+                        />
 
                         <label htmlFor="offsetX">Offset X (not working yet !)</label>
                         <Field className='settings__input' name="offsetX" component="input" type="text" />
@@ -209,4 +211,4 @@ const KochSnowflakeSettingsConnected = connect(mapStateToProps)(KochSnowflakeSet
 //      connects form with redux store
 export default reduxForm({
     form: 'kochSettings',
-})(KochSnowflakeSettingsConnected);;
+})(KochSnowflakeSettingsConnected);
